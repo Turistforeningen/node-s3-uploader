@@ -15,7 +15,7 @@ var client = new Upload('my_s3_bucket', {
     maxWidth: 780
   },{
     maxHeight: 320,
-    maxWisth: 320
+    maxWidth: 320
   }],
   keepOriginal: true
 });
