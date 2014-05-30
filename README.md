@@ -17,6 +17,7 @@ var client = new Upload('my_s3_bucket', {
 
 ### Upload
 
+```javascript
 client.upload('/tmp/some/file', function(err, images) {
   if (err) {
     console.error(err);
@@ -26,3 +27,4 @@ client.upload('/tmp/some/file', function(err, images) {
     }
   }
 });
+```
