@@ -19,5 +19,15 @@ describe('new Client()', function() {
       assert(/^[A-Za-z0-9]{2}\/[A-Za-z0-9]{2}\/[A-Za-z0-9]{2}$/.test(path));
     });
   });
+
+  describe('#_uploadGeneratePath()', function() {
+    it('should return an avaiable path', function(done) {
+      client._uploadGeneratePath(function(err, path) {
+        assert.ifError(err);
+        assert(/^[A-Za-z0-9]{2}\/[A-Za-z0-9]{2}\/[A-Za-z0-9]{2}$/.test(path));
+        done();
+      });
+    });
+  });
 });
 
