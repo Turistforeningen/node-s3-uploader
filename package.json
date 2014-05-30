@@ -8,6 +8,7 @@
   },
   "scripts": {
     "test": "mocha -w -b -c --check-leaks test/suite.js -R progress"
+    "test-drone": "node_modules/.bin/mocha -c test/suite.js -R spec"
   },
   "repository": {
     "type": "git",
