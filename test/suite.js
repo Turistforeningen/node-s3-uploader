@@ -64,7 +64,7 @@ describe('new Client()', function() {
     });
   });
 
-  describe.only('#_upload()', function() {
+  describe('#_upload()', function() {
     beforeEach(function() {
       client._getRandomPath = function() { return 'images_test/ab/cd/ef' };
       client._uploadPathIsAvailable = function(path, cb) { return cb(null, true); };
