@@ -14,14 +14,32 @@ describe('new Client()', function() {
   });
 
   describe('#_getRandomPath()', function() {
-    it('should return return a random path', function() {
+    it('should return a new random path', function() {
       var path = client._getRandomPath();
       assert(/^[A-Za-z0-9]{2}\/[A-Za-z0-9]{2}\/[A-Za-z0-9]{2}$/.test(path));
     });
   });
 
+  describe('#_uploadPathIsAvailable()', function() {
+    it('should return true for avaiable path', function(done) {
+      client._uploadPathIsAvailable('this/should/not/exist', function(err, isAvaiable) {
+        assert.ifError(err);
+        assert.equal(isAvaiable, true);
+        done();
+      });
+    });
+
+    it('should return false for unavaiable path', function(done) {
+      client._uploadPathIsAvailable('images/', function(err, isAvaiable) {
+        assert.ifError(err);
+        assert.equal(isAvaiable, false);
+        done();
+      });
+    });
+  });
+
   describe('#_uploadGeneratePath()', function() {
-    it('should return avaiable path', function(done) {
+    it('should return an avaiable path', function(done) {
       client._uploadPathIsAvailable = function(path, cb) { return cb(null, true); };
       client._uploadGeneratePath(function(err, path) {
         assert.ifError(err);
