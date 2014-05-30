@@ -26,6 +26,12 @@ describe('new Client()', function() {
 
   describe('#_uploadPathIsAvailable()', function() {
     it('should return true for avaiable path', function(done) {
+      this.timeout(10000);
+
+      if (process.env.INTEGRATION_TEST !== 'true') {
+        client.s3.listObjects = function(opts, cb) { return cb(null, {Contents: []}); }
+      }
+
       client._uploadPathIsAvailable('this/should/not/exist', function(err, isAvaiable) {
         assert.ifError(err);
         assert.equal(isAvaiable, true);
@@ -34,7 +40,13 @@ describe('new Client()', function() {
     });
 
     it('should return false for unavaiable path', function(done) {
-      client._uploadPathIsAvailable('images/', function(err, isAvaiable) {
+      this.timeout(10000);
+
+      if (process.env.INTEGRATION_TEST !== 'true') {
+        client.s3.listObjects = function(opts, cb) { return cb(null, {Contents: [opts.Prefix]}); }
+      }
+
+      client._uploadPathIsAvailable('images_test/', function(err, isAvaiable) {
         assert.ifError(err);
         assert.equal(isAvaiable, false);
         done();
