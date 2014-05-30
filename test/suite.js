@@ -20,6 +20,24 @@ describe('new Client()', function() {
     });
   });
 
+  describe('#_uploadPathIsAvailable()', function() {
+    it('should return true for avaiable path', function(done) {
+      client._uploadPathIsAvailable('this/should/not/exist', function(err, isAvaiable) {
+        assert.ifError(err);
+        assert.equal(isAvaiable, true);
+        done();
+      });
+    });
+
+    it('should return false for unavaiable path', function(done) {
+      client._uploadPathIsAvailable('images/', function(err, isAvaiable) {
+        assert.ifError(err);
+        assert.equal(isAvaiable, false);
+        done();
+      });
+    });
+  });
+
   describe('#_uploadGeneratePath()', function() {
     it('should return avaiable path', function(done) {
       client._uploadPathIsAvailable = function(path, cb) { return cb(null, true); };
