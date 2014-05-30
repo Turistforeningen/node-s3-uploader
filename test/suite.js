@@ -20,7 +20,7 @@ describe('new Client()', function() {
   describe('#_getRandomPath()', function() {
     it('should return a new random path', function() {
       var path = client._getRandomPath();
-      assert(/^images\/[A-Za-z0-9]{2}\/[A-Za-z0-9]{2}\/[A-Za-z0-9]{2}$/.test(path));
+      assert(/^images_test\/[A-Za-z0-9]{2}\/[A-Za-z0-9]{2}\/[A-Za-z0-9]{2}$/.test(path));
     });
   });
 
@@ -47,7 +47,7 @@ describe('new Client()', function() {
       client._uploadPathIsAvailable = function(path, cb) { return cb(null, true); };
       client._uploadGeneratePath(function(err, path) {
         assert.ifError(err);
-        assert(/^images\/[A-Za-z0-9]{2}\/[A-Za-z0-9]{2}\/[A-Za-z0-9]{2}$/.test(path));
+        assert(/^images_test\/[A-Za-z0-9]{2}\/[A-Za-z0-9]{2}\/[A-Za-z0-9]{2}$/.test(path));
         done();
       });
     });
@@ -58,7 +58,7 @@ describe('new Client()', function() {
       client._uploadGeneratePath(function(err, path) {
         assert.ifError(err);
         assert.equal(i, 5);
-        assert(/^images\/[A-Za-z0-9]{2}\/[A-Za-z0-9]{2}\/[A-Za-z0-9]{2}$/.test(path));
+        assert(/^images_test\/[A-Za-z0-9]{2}\/[A-Za-z0-9]{2}\/[A-Za-z0-9]{2}$/.test(path));
         done();
       });
     });
@@ -66,7 +66,7 @@ describe('new Client()', function() {
 
   describe.only('#_upload()', function() {
     beforeEach(function() {
-      client._getRandomPath = function() { return 'ab/cd/ef' };
+      client._getRandomPath = function() { return 'images_test/ab/cd/ef' };
       client._uploadPathIsAvailable = function(path, cb) { return cb(null, true); };
     });
 
@@ -96,15 +96,16 @@ describe('new Client()', function() {
 
       if (process.env.INTEGRATION_TEST !== 'true') {
         var etags = {
-          'ab/cd/ef.jpg': '"9c4eec0786092f06c9bb75886bdd255b"',
-          'ab/cd/ef-375.jpg': '"a8b7ced47f0a0287de13e21c0ce03f4f"',
-          'ab/cd/ef-150.jpg': '"20605bd03842d527d9cf16660810ffa0"'
+          'images_test/ab/cd/ef.jpg': '"9c4eec0786092f06c9bb75886bdd255b"',
+          'images_test/ab/cd/ef-375.jpg': '"a8b7ced47f0a0287de13e21c0ce03f4f"',
+          'images_test/ab/cd/ef-150.jpg': '"20605bd03842d527d9cf16660810ffa0"'
         }
         client.s3.putObject = function(opts, cb) { return cb(null, {ETag: etags[opts.Key]}); }
       }
 
       client._upload(files, function(err, results) {
         assert.ifError(err);
+
         assert(results instanceof Array);
         assert.equal(results.length, 3);
 
