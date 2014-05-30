@@ -82,6 +82,21 @@ describe('new Client()', function() {
       client._uploadPathIsAvailable = function(path, cb) { return cb(null, true); };
     });
 
+    if (process.env.INTEGRATION_TEST === 'true') {
+      afterEach(function(done) {
+        client.s3.deleteObjects({Delete: { Objects: [{
+          Key: 'images_test/ab/cd/ef.jpg'
+        },{
+          Key: 'images_test/ab/cd/ef-375.jpg'
+        },{
+          Key: 'images_test/ab/cd/ef-150.jpg'
+        }]}}, function(err) {
+          assert.ifError(err);
+          done()
+        });
+      });
+    }
+
     var files = [{
       tmpName: path.resolve('./test/assets/hans.jpg'),
       contentType: 'image/jpeg',
