@@ -7,7 +7,7 @@
     "test": "test"
   },
   "scripts": {
-    "test": "mocha test/suite.js"
+    "test": "mocha -w -b --check-leaks test/suite.js"
   },
   "repository": {
     "type": "git",
