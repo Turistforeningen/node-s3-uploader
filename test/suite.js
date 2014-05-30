@@ -21,9 +21,21 @@ describe('new Client()', function() {
   });
 
   describe('#_uploadGeneratePath()', function() {
-    it('should return an avaiable path', function(done) {
+    it('should return avaiable path', function(done) {
+      client._uploadPathIsAvailable = function(path, cb) { return cb(null, true); };
       client._uploadGeneratePath(function(err, path) {
         assert.ifError(err);
+        assert(/^[A-Za-z0-9]{2}\/[A-Za-z0-9]{2}\/[A-Za-z0-9]{2}$/.test(path));
+        done();
+      });
+    });
+
+    it('should retry if selected path is not avaiable', function(done) {
+      var i = 0;
+      client._uploadPathIsAvailable = function(path, cb) { return cb(null, (++i === 5)); };
+      client._uploadGeneratePath(function(err, path) {
+        assert.ifError(err);
+        assert.equal(i, 5);
         assert(/^[A-Za-z0-9]{2}\/[A-Za-z0-9]{2}\/[A-Za-z0-9]{2}$/.test(path));
         done();
       });
