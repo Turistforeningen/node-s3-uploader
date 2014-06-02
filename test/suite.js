@@ -125,6 +125,7 @@ describe('new Client()', function() {
     });
 
     it('should successfully put buffer to S3', function(done) {
+      this.timeout(10000);
       if (process.env.INTEGRATION_TEST !== 'true') {
         client.s3.putObject = function(opts, cb) { return cb(null, {ETag: '9c4eec0786092f06c9bb75886bdd255b'}); };
         client._uploadBuffer(buffer, key, type, {}, function(err, data) {
