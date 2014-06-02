@@ -2,8 +2,11 @@ Upload = require('../lib/');
 assert = require('assert');
 path = require('path');
 S3 = require('aws-sdk').S3;
+fs = require('fs');
+gm = require('gm').subClass({imageMagick: true});
+path = require('path');
 
-client = null
+client = null;
 
 beforeEach(function() {
   client = new Upload('turadmin', {
@@ -151,3 +154,52 @@ describe('new Client()', function() {
   });
 });
 
+describe.only('Image', function () {
+
+	it('should return size', function (done) {
+		var portraitJpg = path.resolve('test/assets/portrait.jpg');
+		client._getSize(portraitJpg, function(err, value) {
+      assert.ifError(err);
+      assert.equal(value.width, 3421);
+      assert.equal(value.height, 5434);
+			done();
+		});
+	});
+
+	// var sizes = client.sizes;
+	var sizes = [false, 780, 320];
+
+	for (var i = 0; i < sizes.length; i++) {
+		var maxSize = sizes[i];
+
+		it('should resize to the right size', function (done) {
+
+			var portraitJpg = path.resolve('test/assets/portrait.jpg');
+			client._resize(portraitJpg, maxSize, function(err, buff) {
+				gm(buff).size(function (err, value) {
+					assert.equal(Math.max(value.width, value.height), maxSize);
+					// done();
+				});
+			});
+
+			var landscapeJpg = path.resolve('test/assets/landscape.jpg');
+			client._resize(landscapeJpg, maxSize, function(err, buff) {
+				gm(buff).size(function (err, value) {
+					assert.equal(Math.max(value.width, value.height), maxSize);
+					// done();
+				});
+			});
+
+			var landscapePng = path.resolve('test/assets/pngformat.png');
+			client._resize(landscapePng, maxSize, function(err, buff) {
+				gm(buff).size(function (err, value) {
+					assert.equal(Math.max(value.width, value.height), maxSize);
+					done();
+				});
+			});
+
+		});
+
+	}
+
+});
