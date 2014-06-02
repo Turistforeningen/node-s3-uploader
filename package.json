@@ -7,7 +7,8 @@
     "test": "test"
   },
   "scripts": {
-    "test": "mocha -w -b -c --check-leaks test/suite.js -R progress"
+    "test": "mocha -w -b -c --check-leaks test/suite.js -R progress",
+    "test-drone": "INTEGRATION_TEST=true node_modules/.bin/mocha -c test/suite.js -R spec"
   },
   "repository": {
     "type": "git",
