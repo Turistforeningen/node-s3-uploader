@@ -220,7 +220,7 @@ describe('new Client()', function() {
   });
 });
 
-describe.only('Image', function () {
+describe('Image', function () {
 
 	it('should return size', function (done) {
 		var portraitJpg = path.resolve('test/assets/portrait.jpg');
