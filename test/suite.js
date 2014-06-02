@@ -20,6 +20,43 @@ describe('new Client()', function() {
     assert(client.s3 instanceof S3);
   });
 
+  describe('#_resizeOriginal()', function() {
+    this.timeout(20000);
+
+    it('should return exif data', function(done) {
+      client._resizeOriginal(path.resolve('./test/assets/photo.jpg'), function(err, buffer, exif) {
+        assert.ifError(err);
+
+        gm(buffer).write('./test_output/photo.jpg', function(err) {
+          assert.ifError(err);
+          done();
+        });
+      });
+    });
+
+    it('should autorotate image', function(done) {
+      client._resizeOriginal(path.resolve('./test/assets/rotate.jpg'), function(err, buffer, exif) {
+        assert.ifError(err);
+
+        gm(buffer).write('./test_output/rotate.jpg', function(err) {
+          assert.ifError(err);
+          done();
+        });
+      });
+    });
+
+    it('should do this', function(done) {
+      client._resizeOriginal(path.resolve('test/assets/cmyk.jpg'), function(err, buffer, exif) {
+        assert.ifError(err);
+
+        gm(buffer).write('./test_output/cmyk.jpg', function(err) {
+          assert.ifError(err);
+          done()
+        });
+      });
+    });
+  });
+
   describe('#_getRandomPath()', function() {
     it('should return a new random path', function() {
       var path = client._getRandomPath();
