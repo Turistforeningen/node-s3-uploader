@@ -76,6 +76,71 @@ describe('new Client()', function() {
     });
   });
 
+  describe.only('#_uploadBuffer()', function() {
+    var buffer = null
+      , key = 'images_test/ab/cd/ef.jpg'
+      , type = 'image/jpeg';
+
+    beforeEach(function() {
+      buffer = fs.readFileSync('./test/assets/hans.jpg');
+    });
+
+    it('should set function parameters in put options', function(done) {
+      client.s3.putObject = function(opts, cb) {
+        assert.deepEqual(opts, {
+          ContentType: type,
+          Body: buffer,
+          Key: key
+        });
+        cb()
+      };
+      client._uploadBuffer(buffer, key, type, {}, done);
+    });
+
+    it('should set optional put options', function(done) {
+      client.s3.putObject = function(opts, cb) {
+        assert.deepEqual(opts.Metadata, {foo: 'bar'});
+        cb()
+      };
+      client._uploadBuffer(buffer, key, type, {Metadata: {foo: 'bar'}}, done);
+    });
+
+    it('should set global S3 options', function(done) {
+      client.s3Defaults = {ACL: 'public'};
+      client.s3.putObject = function(opts, cb) {
+        assert.equal(opts.ACL, 'public');
+        cb()
+      };
+      client._uploadBuffer(buffer, key, type, {}, done);
+    });
+
+    it('should set global S3 options without overriding local options', function(done) {
+      client.s3Defaults = {ACL: 'public', Foo: 'bar'};
+      client.s3.putObject = function(opts, cb) {
+        assert.equal(opts.ACL, 'private');
+        assert.equal(opts.Foo, 'bar');
+        cb()
+      };
+      client._uploadBuffer(buffer, key, type, {ACL: 'private'}, done);
+    });
+
+    it('should successfully put buffer to S3', function(done) {
+      if (process.env.INTEGRATION_TEST !== 'true') {
+        client.s3.putObject = function(opts, cb) { return cb(null, {ETag: '9c4eec0786092f06c9bb75886bdd255b'}); };
+        client._uploadBuffer(buffer, key, type, {}, function(err, data) {
+          assert.deepEqual(data, {ETag: '9c4eec0786092f06c9bb75886bdd255b'});
+          done()
+        });
+      } else {
+        client._uploadBuffer(buffer, key, type, {}, function(err, data) {
+          assert.ifError(err);
+          assert.equal(typeof data.ETag, 'string');
+          client.s3.deleteObject({Key: key}, done); // Clean up after upload
+        });
+      }
+    });
+  });
+
   describe('#_upload()', function() {
     beforeEach(function() {
       client._getRandomPath = function() { return 'images_test/ab/cd/ef' };
