@@ -76,7 +76,7 @@ describe('new Client()', function() {
     });
   });
 
-  describe.only('#_uploadBuffer()', function() {
+  describe('#_uploadBuffer()', function() {
     var buffer = null
       , key = 'images_test/ab/cd/ef.jpg'
       , type = 'image/jpeg';
