@@ -27,6 +27,19 @@ var client = new Upload('my_s3_bucket', {
 
 ### Upload
 
+#### Algorithm
+
+```
+A
++-- B
+    `-- C
+    `-- D
+    `-- E
+
+Where A is the original image uploaded by the user. An mpc image is created, B,
+which is used to crate the thumbnails C, D, and E.
+```
+
 ```javascript
 client.upload('/tmp/some/file', function(err, images) {
   if (err) {
