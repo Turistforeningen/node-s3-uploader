@@ -9,8 +9,11 @@ Resize, rename, and upload images to AWS S3
 var Upload = require('s3-uploader');
 var client = new Upload('my_s3_bucket', {
   awsBucketPath: '/images',
-  awsBucketUrl: 'https://some.domain.com/images', 
-  version: [{
+  awsBucketUrl: 'https://some.domain.com/images',
+  versions: [{
+    maxHeight: 1040,
+    maxWidth: 1040
+  },{
     maxHeight: 780,
     maxWidth: 780
   },{
