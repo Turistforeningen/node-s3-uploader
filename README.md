@@ -21,6 +21,7 @@ var client = new Upload('my_s3_bucket', {
     maxWidth: 320
   }],
   keepOriginal: true
+  returnExifData: true
 });
 ```
 
