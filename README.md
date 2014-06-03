@@ -40,8 +40,10 @@ Where A is the original image uploaded by the user. An mpc image is created, B,
 which is used to crate the thumbnails C, D, and E.
 ```
 
+#### Usage
+
 ```javascript
-client.upload('/tmp/some/file', function(err, images) {
+client.upload('/tmp/some/file', function(err, images, exifData) {
   if (err) {
     console.error(err);
   } else {
