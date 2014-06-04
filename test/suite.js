@@ -237,7 +237,7 @@ describe('new Client()', function() {
   describe('upload()', function() {
     this.timeout(10000);
 
-    it('should upload this awesome image', function(done) {
+    it('should upload single image successfully', function(done) {
       client.upload(path.join(assetsDir, 'photo.jpg'), function(err, images) {
         assert.ifError(err);
 
