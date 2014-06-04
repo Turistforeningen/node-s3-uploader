@@ -1,6 +1,8 @@
 node-s3-uploader
 ================
 
+[![NPM](https://nodei.co/npm/s3-uploader.png)](https://nodei.co/npm/s3-uploader/)
+
 Resize, rename, and upload images to AWS S3
 
 ## Install
