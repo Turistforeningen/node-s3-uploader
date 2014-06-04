@@ -1,4 +1,5 @@
 var assert = require('assert');
+var async = require('async');
 var path = require('path');
 var S3 = require('aws-sdk').S3;
 var gm = require('gm').subClass({imageMagick: true});
@@ -244,6 +245,34 @@ describe('new Client()', function() {
 
         for(var i = 0; i < images.length; i++) {
           cleanup.push({Key: images[i].path});
+        }
+
+        done()
+      });
+    });
+
+    it('should upload multiple images successfully', function(done) {
+      this.timeout(30000);
+
+      var images = [
+        path.join(assetsDir, 'photo.jpg'),
+        path.join(assetsDir, 'photo.jpg'),
+        path.join(assetsDir, 'photo.jpg'),
+        path.join(assetsDir, 'photo.jpg'),
+        path.join(assetsDir, 'photo.jpg')
+      ];
+
+      // 2 images simmultaniously seams to be optimal for S3
+      // 1 image at a time seam to be optimal locally
+      async.mapLimit(images, 2, client.upload.bind(client), function(err, images) {
+        assert.ifError(err);
+
+        // @TODO assert things here
+
+        for(var i = 0; i < images.length; i++) {
+          for(var j = 0; j < images[i].length; j++) {
+            cleanup.push({Key: images[i][j].path});
+          }
         }
 
         done()
