@@ -47,13 +47,13 @@ beforeEach(function() {
 // Clean up S3 objects
 if (process.env.INTEGRATION_TEST === 'true') {
   afterEach(function(done) {
-    if (cleanup.length !== 0) {
-      client.s3.deleteObjects({Delete: {Objects: cleanup}}, function(err) {
-        if (err) { throw err; }
-        cleanup = [];
-        done();
-      });
-    }
+    if (cleanup.length === 0) { return process.nextTick(done); }
+
+    client.s3.deleteObjects({Delete: {Objects: cleanup}}, function(err) {
+      if (err) { throw err; }
+      cleanup = [];
+      done();
+    });
   });
 }
 
