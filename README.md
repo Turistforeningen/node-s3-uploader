@@ -3,7 +3,7 @@ node-s3-uploader
 
 Resize, rename, and upload images to AWS S3
 
-## Usage
+## API
 
 ```javascript
 var Upload = require('s3-uploader');
@@ -11,21 +11,25 @@ var client = new Upload('my_s3_bucket', {
   awsBucketPath: '/images',
   awsBucketUrl: 'https://some.domain.com/images',
   versions: [{
+    original: true
+  },{
     maxHeight: 1040,
-    maxWidth: 1040
+    maxWidth: 1040,
+    suffix: '-large',
+    quality: 80
   },{
     maxHeight: 780,
     maxWidth: 780
+    suffix: '-medium',
   },{
     maxHeight: 320,
     maxWidth: 320
-  }],
-  keepOriginal: true
-  returnExifData: true
+    suffix: '-small',
+  }]
 });
 ```
 
-### Upload
+### #upload()
 
 #### Algorithm
 
@@ -53,3 +57,14 @@ client.upload('/tmp/some/file', function(err, images, exifData) {
   }
 });
 ```
+
+## ToDo
+
+* [ ] return image exif data
+* [ ] return correct image size for thumbnails
+* [ ] write S3 metadata defaults
+* [ ] write S3 metadata per upload
+* [ ] delete src image on request
+* [ ] async retries options
+* [ ] remove images
+
