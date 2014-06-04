@@ -3,7 +3,9 @@ AWS S3 Image Uploader [![Build Status](https://drone.io/github.com/Turistforenin
 
 [![NPM](https://nodei.co/npm/s3-uploader.png)](https://nodei.co/npm/s3-uploader/)
 
-Resize, rename, and upload images to AWS S3
+Flexible and efficient resize, rename, and upload images to Amazon S3 disk
+storage. Uses the official [AWS Node SDK](http://aws.amazon.com/sdkfornodejs/)
+and [GM](https://github.com/aheckmann/gm) for image processing.
 
 ## Install
 
