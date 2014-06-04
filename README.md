@@ -18,6 +18,7 @@ var Upload = require('s3-uploader');
 var client = new Upload('my_s3_bucket', {
   awsBucketPath: '/images',
   awsBucketUrl: 'https://some.domain.com/images',
+  awsBucketAcl: 'public',
   versions: [{
     original: true
   },{
