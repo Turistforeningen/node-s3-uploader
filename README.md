@@ -3,6 +3,12 @@ node-s3-uploader
 
 Resize, rename, and upload images to AWS S3
 
+## Install
+
+```
+npm install s3-uploader --save
+```
+
 ## API
 
 ```javascript
