@@ -40,6 +40,18 @@ var client = new Upload('my_s3_bucket', {
 
 ### #upload()
 
+```javascript
+client.upload('/tmp/some/file', function(err, images, exifData) {
+  if (err) {
+    console.error(err);
+  } else {
+    for (var i = 0; i < images.length; i++) {
+      console.log('Thumbnail with width %i, height %i, at %s', images[i].width, images[i].height, images[i].url);
+    }
+  }
+});
+```
+
 #### Algorithm
 
 ```
@@ -51,20 +63,6 @@ A
 
 Where A is the original image uploaded by the user. An mpc image is created, B,
 which is used to crate the thumbnails C, D, and E.
-```
-
-#### Usage
-
-```javascript
-client.upload('/tmp/some/file', function(err, images, exifData) {
-  if (err) {
-    console.error(err);
-  } else {
-    for (var i = 0; i < images.length; i++) {
-      console.log('Thumbnail with width %i, height %i, at %s', images[i].width, images[i].height, images[i].url);
-    }
-  }
-});
 ```
 
 ## ToDo
