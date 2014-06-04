@@ -227,6 +227,8 @@ describe('new Client()', function() {
   });
 
   describe('#_uploadImage()', function() {
+    it('should set correct S3 options');
+    it('should handle S3 upload failure');
     it('should upload Buffer image to S3');
     it('should upload readStream image to S3');
   });
