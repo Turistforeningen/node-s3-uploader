@@ -15,8 +15,10 @@ beforeEach(function() {
   client = new Upload('turadmin', {
     awsBucketUrl: 'https://s3-eu-west-1.amazonaws.com/turadmin/',
     awsBucketPath: 'images_test/',
+    awsBucketAcl: 'public-read',
     versions: [{
-      original: true
+      original: true,
+      acl: 'private'
     },{
       maxHeight: 1040,
       maxWidth: 1040,
