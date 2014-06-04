@@ -1,4 +1,4 @@
-node-s3-uploader
+node-s3-uploader [![Build Status](https://drone.io/github.com/Turistforeningen/node-s3-uploader/status.png)](https://drone.io/github.com/Turistforeningen/node-s3-uploader/latest)
 ================
 
 [![NPM](https://nodei.co/npm/s3-uploader.png)](https://nodei.co/npm/s3-uploader/)
