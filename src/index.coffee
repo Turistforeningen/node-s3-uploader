@@ -28,7 +28,7 @@ Upload.prototype._getRandomPath = ->
   input = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
   res = []
 
-  for i in [0..3]
+  for i in [1..3]
     x = input[Math.floor((Math.random() * input.length))]
     y = input[Math.floor((Math.random() * input.length))]
     res.push x + y
