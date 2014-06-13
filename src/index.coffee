@@ -145,7 +145,7 @@ Image.prototype.exec = (cb) ->
   @getMeta (err) =>
     return cb err if err
     versions = JSON.parse(JSON.stringify(@config.versions))
-    async.map versions, @resizeAndUpload.bind(@), (err, versions) =>
+    async.mapLimit versions, 2, @resizeAndUpload.bind(@), (err, versions) =>
       return cb err if err
       return cb null, versions, @meta
 
