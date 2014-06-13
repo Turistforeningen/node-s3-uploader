@@ -133,7 +133,6 @@ Image.prototype.upload = (version, cb) ->
 
     delete version.awsImageAcl
     delete version.suffix
-    delete version.src
 
     cb null, version
 
