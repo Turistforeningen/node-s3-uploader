@@ -232,7 +232,7 @@ describe 'Upload', ->
           assert.ifError err
 
           for image in images
-            cleanup.push Key: image.path # clean up in AWS
+            cleanup.push Key: image.path if image.path # clean up in AWS
 
             if image.original
               assert.equal typeof image.size, 'string'
