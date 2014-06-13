@@ -78,13 +78,6 @@ Image.prototype.getMeta = (cb) ->
       exif: val.Properties if @returnExif
     return cb null, @meta
 
-Image.prototype.resizeAndUpload = (version, cb) ->
-  version.suffix = version.suffix or ''
-
-  @resize version, (err, version) =>
-    return cb err if err
-    @upload version, cb
-
 Image.prototype.resize = (version, cb) ->
   if version.original
     version.src = @src
@@ -140,6 +133,13 @@ Image.prototype.upload = (version, cb) ->
     delete version.src
 
     cb null, version
+
+Image.prototype.resizeAndUpload = (version, cb) ->
+  version.suffix = version.suffix or ''
+
+  @resize version, (err, version) =>
+    return cb err if err
+    @upload version, cb
 
 Image.prototype.exec = (cb) ->
   @getMeta (err) =>
