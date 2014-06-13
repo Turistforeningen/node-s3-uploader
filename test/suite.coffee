@@ -69,7 +69,9 @@ describe 'Upload', ->
     it 'should override default values'
 
   describe '#_getRandomPath()', ->
-    it 'should return a new random path'
+    it 'should return a new random path', ->
+      path = client._getRandomPath()
+      assert(/^images_test\/[A-Za-z0-9]{2}\/[A-Za-z0-9]{2}\/[A-Za-z0-9]{2}$/.test(path))
 
   describe '#_uploadPathIsAvailable()', ->
     it 'should return true for avaiable path'
