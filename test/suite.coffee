@@ -90,8 +90,19 @@ describe 'Upload', ->
         assert.equal isAvaiable, false
         done()
 
-  describe '#__uploadGeneratePath()', ->
-    it 'should return an avaiable path'
+  describe '#_uploadGeneratePath()', ->
+    it 'should return an error if path is taken', (done) ->
+      client._uploadPathIsAvailable = (path, cb) -> process.nextTick -> cb null, path, false
+      client._uploadGeneratePath (err, path) ->
+        assert /Path '[^']+' not avaiable!/.test err
+        done()
+
+    it 'should return an avaiable path', (done) ->
+      client._uploadPathIsAvailable = (path, cb) -> process.nextTick -> cb null, path, true
+      client._uploadGeneratePath (err, path) ->
+        assert.ifError err
+        assert /^images_test\/[A-Za-z0-9]{2}\/[A-Za-z0-9]{2}\/[A-Za-z0-9]{2}$/.test(path)
+        done()
 
   describe '#upload()', ->
     describe 'Image', ->
