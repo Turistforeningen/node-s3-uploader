@@ -6,7 +6,7 @@ rand = require('crypto').pseudoRandomBytes
 
 S3 = require('aws-sdk').S3
 
-client = null
+client = listObjects = putObject = null
 cleanup = []
 
 beforeEach ->
@@ -34,9 +34,11 @@ beforeEach ->
 
   # Mock S3 API calls
   if process.env.INTEGRATION_TEST isnt 'true'
+    listObjects = client.s3.listObjects
     client.s3.listObjects = (path, cb) ->
       process.nextTick -> cb null, Contents: []
 
+    putObject = client.s3.putObject
     client.s3.putObject = (opts, cb) ->
       process.nextTick -> cb null, ETag: hash('md5').update(rand(32)).digest('hex')
 
@@ -74,8 +76,19 @@ describe 'Upload', ->
       assert(/^images_test\/[A-Za-z0-9]{2}\/[A-Za-z0-9]{2}\/[A-Za-z0-9]{2}$/.test(path))
 
   describe '#_uploadPathIsAvailable()', ->
-    it 'should return true for avaiable path'
-    it 'should return false for unavaiable path'
+    it 'should return true for avaiable path', (done) ->
+      client.s3.listObjects = (opts, cb) -> process.nextTick -> cb null, Contents: []
+      client._uploadPathIsAvailable 'some/path/', (err, path, isAvaiable) ->
+        assert.ifError err
+        assert.equal isAvaiable, true
+        done()
+
+    it 'should return false for unavaiable path', (done) ->
+      client.s3.listObjects = (opts, cb) -> process.nextTick -> cb null, Contents: [opts.Prefix]
+      client._uploadPathIsAvailable 'some/path/', (err, path, isAvaiable) ->
+        assert.ifError err
+        assert.equal isAvaiable, false
+        done()
 
   describe '#__uploadGeneratePath()', ->
     it 'should return an avaiable path'
@@ -129,5 +142,6 @@ describe 'Upload', ->
         it 'should make a copy of master version objects array'
         it 'should resize and upload original image accroding to versions'
 
-    it 'should upload image to new random path'
+    describe '', ->
+      it 'should upload image to new random path'
 
