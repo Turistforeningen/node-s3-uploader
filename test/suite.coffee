@@ -157,7 +157,6 @@ describe 'Upload', ->
             assert.equal image.meta.exif, undefined
             done()
 
-
         it 'should return exif data if returnExif is set to true', (done) ->
           image.config.returnExif = true
           image.getMeta (err) ->
