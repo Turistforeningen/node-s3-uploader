@@ -130,6 +130,7 @@ describe 'Upload', ->
 
       describe '#getMeta()', ->
         it 'should return image metadata', (done) ->
+          @timeout 10000
           image.getMeta (err, meta) ->
             assert.ifError err
             assert.equal meta.format, 'jpeg'
@@ -144,6 +145,7 @@ describe 'Upload', ->
             done()
 
         it 'should store image matadata', (done) ->
+          @timeout 10000
           image.getMeta (err) ->
             assert.ifError err
             assert.equal image.meta.format, 'jpeg'
@@ -158,6 +160,7 @@ describe 'Upload', ->
             done()
 
         it 'should return exif data if returnExif is set to true', (done) ->
+          @timeout 10000
           image.config.returnExif = true
           image.getMeta (err) ->
             assert.ifError err
@@ -165,6 +168,7 @@ describe 'Upload', ->
             done()
 
         it 'should store gm image instance', (done) ->
+          @timeout 10000
           image.getMeta (err) ->
             assert.ifError err
             assert image.gm instanceof require('gm')
