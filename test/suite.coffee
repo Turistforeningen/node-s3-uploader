@@ -201,5 +201,50 @@ describe 'Upload', ->
         it 'should resize and upload original image accroding to versions'
 
     describe '', ->
-      it 'should upload image to new random path'
+      it 'should upload image to new random path', (done) ->
+        @timeout 20000
+        upload.upload __dirname + '/assets/photo.jpg', {}, (err, images, meta) ->
+          assert.ifError err
+
+          for image in images
+            cleanup.push Key: image.path # clean up in AWS
+
+            if image.original
+              assert.equal typeof image.size, 'string'
+
+            assert.equal typeof image.src, 'string'
+            assert.equal typeof image.format, 'string'
+            assert.equal typeof image.width, 'number'
+            assert.equal typeof image.height, 'number'
+            assert.equal typeof image.etag, 'string'
+            assert.equal typeof image.path, 'string'
+            assert.equal typeof image.url, 'string'
+
+          done()
+
+      it 'should not upload original of keepOriginal is false', (done) ->
+        @timeout 20000
+        upload.keepOriginal = false
+        upload.upload __dirname + '/assets/photo.jpg', {}, (err, images, meta) ->
+          assert.ifError err
+
+          for image in images
+            cleanup.push Key: image.path # clean up in AWS
+
+            if image.original
+              assert.equal typeof image.size, 'string'
+              assert.equal typeof image.etag, 'undefined'
+              assert.equal typeof image.path, 'undefined'
+              assert.equal typeof image.url, 'undefined'
+            else
+              assert.equal typeof image.etag, 'string'
+              assert.equal typeof image.path, 'string'
+              assert.equal typeof image.url, 'string'
+
+            assert.equal typeof image.src, 'string'
+            assert.equal typeof image.format, 'string'
+            assert.equal typeof image.width, 'number'
+            assert.equal typeof image.height, 'number'
+
+          done()
 
