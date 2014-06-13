@@ -8,7 +8,7 @@
   },
   "scripts": {
     "test": "mocha -w -b -c --check-leaks test/suite.coffee -R progress --compilers coffee:coffee-script/register",
-    "test-drone": "INTEGRATION_TEST=true node_modules/.bin/mocha -c test/suite.js -R spec"
+    "test-drone": "INTEGRATION_TEST=true node_modules/.bin/mocha -w -b -c --check-leaks test/suite.coffee -R spec --compilers coffee:coffee-script/register"
   },
   "repository": {
     "type": "git",
