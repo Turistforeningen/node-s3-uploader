@@ -4,11 +4,11 @@ Upload = require '../src/index.coffee'
 hash = require('crypto').createHash
 rand = require('crypto').pseudoRandomBytes
 
-client = listObjects = putObject = null
+upload = listObjects = putObject = null
 cleanup = []
 
 beforeEach ->
-  client = new Upload 'turadmin',
+  upload = new Upload 'turadmin',
     awsBucketPath: 'images_test/'
     awsBucketUrl: 'https://s3-eu-west-1.amazonaws.com/turadmin/'
     awsBucketAcl: 'public-read'
@@ -32,12 +32,12 @@ beforeEach ->
 
   # Mock S3 API calls
   if process.env.INTEGRATION_TEST isnt 'true'
-    listObjects = client.s3.listObjects
-    client.s3.listObjects = (path, cb) ->
+    listObjects = upload.s3.listObjects
+    upload.s3.listObjects = (path, cb) ->
       process.nextTick -> cb null, Contents: []
 
-    putObject = client.s3.putObject
-    client.s3.putObject = (opts, cb) ->
+    putObject = upload.s3.putObject
+    upload.s3.putObject = (opts, cb) ->
       process.nextTick -> cb null, ETag: hash('md5').update(rand(32)).digest('hex')
 
 # Clean up S3 objects
@@ -45,7 +45,7 @@ if process.env.INTEGRATION_TEST is 'true'
   afterEach (done) ->
     return process.nextTick done if cleanup.length is 0
 
-    client.s3.deleteObjects Delete: Objects: cleanup, (err) ->
+    upload.s3.deleteObjects Delete: Objects: cleanup, (err) ->
       throw err if err
       cleanup = []
       done()
@@ -58,51 +58,51 @@ describe 'Upload', ->
       , /Bucket name can not be undefined/
 
     it 'should set default values if not provided', ->
-      client = new Upload 'myBucket'
+      upload = new Upload 'myBucket'
 
-      assert client.s3 instanceof require('aws-sdk').S3
-      assert client.versions instanceof Array
-      assert.equal client.awsBucketPath, ''
-      assert.equal client.awsBucketUrl, undefined
-      assert.equal client.awsBucketAcl, 'privat'
-      assert.equal client.resizeQuality, 70
-      assert.equal client.keepOriginal, true
-      assert.equal client.returnExif, false
-      assert.equal client.tmpDir, '/tmp/'
-      assert.equal client.tmpPrefix, 'gm-'
+      assert upload.s3 instanceof require('aws-sdk').S3
+      assert upload.versions instanceof Array
+      assert.equal upload.awsBucketPath, ''
+      assert.equal upload.awsBucketUrl, undefined
+      assert.equal upload.awsBucketAcl, 'privat'
+      assert.equal upload.resizeQuality, 70
+      assert.equal upload.keepOriginal, true
+      assert.equal upload.returnExif, false
+      assert.equal upload.tmpDir, '/tmp/'
+      assert.equal upload.tmpPrefix, 'gm-'
 
     it 'should override default values'
 
   describe '#_getRandomPath()', ->
     it 'should return a new random path', ->
-      path = client._getRandomPath()
+      path = upload._getRandomPath()
       assert(/^images_test\/[A-Za-z0-9]{2}\/[A-Za-z0-9]{2}\/[A-Za-z0-9]{2}$/.test(path))
 
   describe '#_uploadPathIsAvailable()', ->
     it 'should return true for avaiable path', (done) ->
-      client.s3.listObjects = (opts, cb) -> process.nextTick -> cb null, Contents: []
-      client._uploadPathIsAvailable 'some/path/', (err, path, isAvaiable) ->
+      upload.s3.listObjects = (opts, cb) -> process.nextTick -> cb null, Contents: []
+      upload._uploadPathIsAvailable 'some/path/', (err, path, isAvaiable) ->
         assert.ifError err
         assert.equal isAvaiable, true
         done()
 
     it 'should return false for unavaiable path', (done) ->
-      client.s3.listObjects = (opts, cb) -> process.nextTick -> cb null, Contents: [opts.Prefix]
-      client._uploadPathIsAvailable 'some/path/', (err, path, isAvaiable) ->
+      upload.s3.listObjects = (opts, cb) -> process.nextTick -> cb null, Contents: [opts.Prefix]
+      upload._uploadPathIsAvailable 'some/path/', (err, path, isAvaiable) ->
         assert.ifError err
         assert.equal isAvaiable, false
         done()
 
   describe '#_uploadGeneratePath()', ->
     it 'should return an error if path is taken', (done) ->
-      client._uploadPathIsAvailable = (path, cb) -> process.nextTick -> cb null, path, false
-      client._uploadGeneratePath (err, path) ->
+      upload._uploadPathIsAvailable = (path, cb) -> process.nextTick -> cb null, path, false
+      upload._uploadGeneratePath (err, path) ->
         assert /Path '[^']+' not avaiable!/.test err
         done()
 
     it 'should return an avaiable path', (done) ->
-      client._uploadPathIsAvailable = (path, cb) -> process.nextTick -> cb null, path, true
-      client._uploadGeneratePath (err, path) ->
+      upload._uploadPathIsAvailable = (path, cb) -> process.nextTick -> cb null, path, true
+      upload._uploadGeneratePath (err, path) ->
         assert.ifError err
         assert /^images_test\/[A-Za-z0-9]{2}\/[A-Za-z0-9]{2}\/[A-Za-z0-9]{2}$/.test(path)
         done()
@@ -116,7 +116,7 @@ describe 'Upload', ->
         dest = 'images_test/Wm/PH/f3/I0'
         opts = {}
 
-        image = new Upload.Image src, dest, opts, client
+        image = new Upload.Image src, dest, opts, upload
 
       describe 'constructor', ->
         it 'should set default values', ->
