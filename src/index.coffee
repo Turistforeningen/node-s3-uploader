@@ -114,6 +114,7 @@ Image.prototype.resize = (version, cb) ->
 
 Image.prototype.upload = (version, cb) ->
   if version.original and @config.keepOriginal is false
+    delete version.suffix
     return process.nextTick -> cb null, version
 
   options =
