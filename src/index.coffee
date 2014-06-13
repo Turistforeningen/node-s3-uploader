@@ -64,7 +64,7 @@ Image = Upload.Image = (src, dest, opts, config) ->
 
   @
 
-Image.prototype.getImageMetadata = (cb) ->
+Image.prototype.getMeta = (cb) ->
   @gm = gm(@src).identify (err, val) =>
     return cb err if err
     @meta =
@@ -142,7 +142,7 @@ Image.prototype.upload = (version, cb) ->
     cb null, version
 
 Image.prototype.exec = (cb) ->
-  @getImageMetadata (err) =>
+  @getMeta (err) =>
     return cb err if err
     versions = JSON.parse(JSON.stringify(@config.versions))
     async.map versions, @resizeAndUpload.bind(@), (err, versions) =>
