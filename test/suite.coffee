@@ -4,8 +4,6 @@ Upload = require '../src/index.coffee'
 hash = require('crypto').createHash
 rand = require('crypto').pseudoRandomBytes
 
-S3 = require('aws-sdk').S3
-
 client = listObjects = putObject = null
 cleanup = []
 
@@ -62,7 +60,7 @@ describe 'Upload', ->
     it 'should set default values if not provided', ->
       client = new Upload 'myBucket'
 
-      assert client.s3 instanceof S3
+      assert client.s3 instanceof require('aws-sdk').S3
       assert client.versions instanceof Array
       assert.equal client.awsBucketPath, ''
       assert.equal client.awsBucketUrl, undefined
@@ -114,7 +112,7 @@ describe 'Upload', ->
       image = null
 
       beforeEach ->
-        src = __dirname + 'test/assets/photo.jpg'
+        src = __dirname + '/assets/photo.jpg'
         dest = 'images_test/Wm/PH/f3/I0'
         opts = {}
 
@@ -124,17 +122,54 @@ describe 'Upload', ->
         it 'should set default values', ->
           assert image instanceof Upload.Image
           assert image.config instanceof Upload
-          assert.equal image.src, __dirname + 'test/assets/photo.jpg'
+          assert.equal image.src, __dirname + '/assets/photo.jpg'
           assert.equal image.dest, 'images_test/Wm/PH/f3/I0'
           assert /[a-z0-9]{24}/.test image.tmpName
           assert.deepEqual image.meta, {}
           assert.equal image.gm, null
 
       describe '#getMeta()', ->
-        it 'should store image matadata'
-        it 'should store gm image instance'
-        it 'should return image metadata'
-        it 'should return exif data if returnExif is set to true'
+        it 'should return image metadata', (done) ->
+          image.getMeta (err, meta) ->
+            assert.ifError err
+            assert.equal meta.format, 'jpeg'
+            assert.equal meta.fileSize, '617KBB'
+            assert.equal meta.imageSize.width, 1536
+            assert.equal meta.imageSize.height, 2048
+            assert.equal meta.orientation, 'Undefined'
+            assert.equal meta.colorSpace, 'RGB'
+            assert.equal meta.compression, 'JPEG'
+            assert.equal meta.quallity, '96'
+            assert.equal meta.exif, undefined
+            done()
+
+        it 'should store image matadata', (done) ->
+          image.getMeta (err) ->
+            assert.ifError err
+            assert.equal image.meta.format, 'jpeg'
+            assert.equal image.meta.fileSize, '617KBB'
+            assert.equal image.meta.imageSize.width, 1536
+            assert.equal image.meta.imageSize.height, 2048
+            assert.equal image.meta.orientation, 'Undefined'
+            assert.equal image.meta.colorSpace, 'RGB'
+            assert.equal image.meta.compression, 'JPEG'
+            assert.equal image.meta.quallity, '96'
+            assert.equal image.meta.exif, undefined
+            done()
+
+
+        it 'should return exif data if returnExif is set to true', (done) ->
+          image.config.returnExif = true
+          image.getMeta (err) ->
+            assert.ifError err
+            assert.equal typeof image.meta.exif, 'object'
+            done()
+
+        it 'should store gm image instance', (done) ->
+          image.getMeta (err) ->
+            assert.ifError err
+            assert image.gm instanceof require('gm')
+            done()
 
       describe '#resize()', ->
         it 'should return updated properties for original image'
