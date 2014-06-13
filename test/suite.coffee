@@ -54,6 +54,11 @@ if process.env.INTEGRATION_TEST is 'true'
 
 describe 'Upload', ->
   describe 'constructor', ->
+    it 'should throw error for missing awsBucketName param', ->
+      assert.throws ->
+        new Upload()
+      , /Bucket name can not be undefined/
+
     it 'should set default values if not provided', ->
       client = new Upload 'myBucket'
 
