@@ -7,6 +7,8 @@ hash = require('crypto').createHash
 rand = require('crypto').pseudoRandomBytes
 
 Upload = module.exports = (awsBucketName, opts) ->
+  throw new Error 'Bucket name can not be undefined' if not awsBucketName
+
   @s3 = new S3 params: Bucket: awsBucketName
 
   @versions = opts?.versions or []
