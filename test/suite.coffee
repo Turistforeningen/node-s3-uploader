@@ -33,7 +33,7 @@ beforeEach ->
     }]
 
   # Mock S3 API calls
-  if process.env.INTEGRATION_TEST isnt 'true' and true
+  if process.env.INTEGRATION_TEST isnt 'true'
     client.s3.listObjects = (path, cb) ->
       process.nextTick -> cb null, Contents: []
 
@@ -78,7 +78,7 @@ describe 'Upload', ->
   describe '#__uploadGeneratePath()', ->
     it 'should return an avaiable path'
 
-  describe.skip '#upload()', ->
+  describe '#upload()', ->
     describe 'Image', ->
       image = null
 
@@ -131,6 +131,5 @@ describe 'Upload', ->
       @timeout 20000
       client.upload 'test/assets/photo.tiff', {}, (err, versions, meta) ->
         assert.ifError err
-        console.log versions
         done()
 

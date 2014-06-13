@@ -1,6 +1,6 @@
 {
   "name": "s3-uploader",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "description": "Resize, rename, and upload images to AWS S3",
   "main": "lib/index.js",
   "directories": {
@@ -8,7 +8,7 @@
   },
   "scripts": {
     "test": "mocha -w -b -c --check-leaks test/suite.coffee -R progress --compilers coffee:coffee-script/register",
-    "test-drone": "INTEGRATION_TEST=true node_modules/.bin/mocha -w -b -c --check-leaks test/suite.coffee -R spec --compilers coffee:coffee-script/register"
+    "test-drone": "INTEGRATION_TEST=true node_modules/.bin/mocha -b -c --check-leaks test/suite.coffee -R spec --compilers coffee:coffee-script/register"
   },
   "repository": {
     "type": "git",
