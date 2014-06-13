@@ -60,7 +60,9 @@ Image = Upload.Image = (src, dest, opts, config) ->
 
   @opts = opts or {}
   @returnExif = opts.returnExif or config.returnExif
+
   @meta = {}
+  @gm = null
 
   @
 
@@ -75,7 +77,7 @@ Image.prototype.getMeta = (cb) ->
       colorSpace: val.Colorspace
       compression: val.Compression
       quallity: val.Quality
-      exif: val.Properties if @returnExif
+      exif: val.Properties if @config.returnExif
     return cb null, @meta
 
 Image.prototype.resize = (version, cb) ->
