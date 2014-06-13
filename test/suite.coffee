@@ -127,9 +127,5 @@ describe 'Upload', ->
         it 'should make a copy of master version objects array'
         it 'should resize and upload original image accroding to versions'
 
-    it 'should upload', (done) ->
-      @timeout 20000
-      client.upload 'test/assets/photo.tiff', {}, (err, versions, meta) ->
-        assert.ifError err
-        done()
+    it 'should upload image to new random path'
 
