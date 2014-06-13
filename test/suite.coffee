@@ -116,7 +116,14 @@ describe 'Upload', ->
         image = new Upload.Image src, dest, opts, client
 
       describe 'constructor', ->
-        it 'should set default values'
+        it 'should set default values', ->
+          assert image instanceof Upload.Image
+          assert image.config instanceof Upload
+          assert.equal image.src, __dirname + 'test/assets/photo.jpg'
+          assert.equal image.dest, 'images_test/Wm/PH/f3/I0'
+          assert /[a-z0-9]{24}/.test image.tmpName
+          assert.deepEqual image.meta, {}
+          assert.equal image.gm, null
 
       describe '#getMeta()', ->
         it 'should store image matadata'
