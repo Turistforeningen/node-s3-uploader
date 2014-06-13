@@ -1,14 +1,14 @@
 {
   "name": "s3-uploader",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "description": "Resize, rename, and upload images to AWS S3",
   "main": "lib/index.js",
   "directories": {
     "test": "test"
   },
   "scripts": {
-    "test": "mocha -w -b -c --check-leaks test/suite.js -R progress",
-    "test-drone": "INTEGRATION_TEST=true node_modules/.bin/mocha -c test/suite.js -R spec"
+    "test": "mocha -w -b -c --check-leaks test/suite.coffee -R progress --compilers coffee:coffee-script/register",
+    "test-drone": "INTEGRATION_TEST=true node_modules/.bin/mocha -b -c --check-leaks test/suite.coffee -R spec --compilers coffee:coffee-script/register"
   },
   "repository": {
     "type": "git",
@@ -33,6 +33,7 @@
   },
   "homepage": "https://github.com/Turistforeningen/node-s3-uploader",
   "devDependencies": {
+    "coffee-script": "^1.7.1",
     "mocha": "1.20.0"
   },
   "dependencies": {
