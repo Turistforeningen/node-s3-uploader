@@ -7,6 +7,9 @@
     "test": "test"
   },
   "scripts": {
+    "build": "coffee --bare --compile --output lib/ src/*.coffee",
+    "prepublish": "coffee --bare --compile --output lib/ src/*.coffee",
+    "postpublish": "rm -rf lib/*",
     "test": "mocha -w -b -c --check-leaks test/suite.coffee -R progress --compilers coffee:coffee-script/register",
     "test-drone": "INTEGRATION_TEST=true node_modules/.bin/mocha -b -c --check-leaks test/suite.coffee -R spec --compilers coffee:coffee-script/register"
   },
