@@ -13,6 +13,11 @@ and [GM](https://github.com/aheckmann/gm) for image processing.
 npm install s3-uploader --save
 ```
 
+## Requirements
+
+* Node.JS >= v0.10
+* imagemagic
+
 ## API
 
 ```javascript
