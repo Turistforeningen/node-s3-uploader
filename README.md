@@ -23,8 +23,8 @@ npm install s3-uploader --save
 ```javascript
 var Upload = require('s3-uploader');
 var client = new Upload('my_s3_bucket', {
-  awsBucketPath: '/images',
-  awsBucketUrl: 'https://some.domain.com/images',
+  awsBucketPath: 'images/',
+  awsBucketUrl: 'https://s3-eu-west-1.amazonaws.com/my_s3_bucket/',
   awsBucketAcl: 'public',
   versions: [{
     original: true
