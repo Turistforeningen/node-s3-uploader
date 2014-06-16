@@ -1,6 +1,9 @@
 assert = require 'assert'
 Upload = require '../src/index.coffee'
 
+fs = require('fs')
+gm = require('gm').subClass imageMagick: true
+
 hash = require('crypto').createHash
 rand = require('crypto').pseudoRandomBytes
 
@@ -175,13 +178,104 @@ describe 'Upload', ->
             done()
 
       describe '#resize()', ->
-        it 'should return updated properties for original image'
-        it 'should return updated properties for resized image'
-        it 'should write resized image to temp destination'
-        it 'should set hegith and width for reszied image'
-        it 'should set corret orientation for resized image'
-        it 'should set colorspace to RGB for resized image'
-        it 'should set quality for resized image'
+        versions = null
+        beforeEach ->
+          versions = JSON.parse JSON.stringify upload.versions
+          versions[0].suffix = ''
+
+          image.src = __dirname + '/assets/photo.jpg'
+          image.tmpName = 'ed8d8b72071e731dc9065095c92c3e384d7c1e27'
+          image.meta =
+            format: 'jpeg'
+            fileSize: '617KBB'
+            imageSize: width: 1536, height: 2048
+            orientation: 'Undefined'
+            colorSpace: 'RGB'
+            compression: 'JPEG'
+            quallity: '96'
+            exif: undefined
+
+        it 'should return updated properties for original image', (done) ->
+          @timeout 10000
+          image.resize JSON.parse(JSON.stringify(versions[0])), (err, version) ->
+            assert.ifError err
+            assert.deepEqual version,
+              original: true,
+              awsImageAcl: 'private'
+              suffix: ''
+              src: image.src
+              format: image.meta.format
+              size: image.meta.fileSize
+              width: image.meta.imageSize.width
+              height: image.meta.imageSize.height
+            done()
+
+        it 'should return updated properties for resized image', (done) ->
+          @timeout 10000
+          image.resize JSON.parse(JSON.stringify(versions[1])), (err, version) ->
+            assert.ifError err
+            assert.deepEqual version,
+              suffix: versions[1].suffix
+              quality: versions[1].quality
+              format: 'jpeg'
+              src: '/tmp/gm-ed8d8b72071e731dc9065095c92c3e384d7c1e27-large.jpeg'
+              width: versions[1].maxWidth
+              height: versions[1].maxHeight
+
+            done()
+
+        it 'should write resized image to temp destination', (done) ->
+          @timeout 10000
+          image.resize JSON.parse(JSON.stringify(versions[1])), (err, version) ->
+            assert.ifError err
+            fs.stat version.src, (err, stat) ->
+              assert.ifError err
+              assert.equal typeof stat, 'object'
+              done()
+
+        it 'should set hegith and width for reszied image', (done) ->
+          @timeout 10000
+          image.resize JSON.parse(JSON.stringify(versions[1])), (err, version) ->
+            assert.ifError err
+            gm(version.src).size (err, value) ->
+              assert.ifError err
+              assert.deepEqual value,
+                width: 780
+                height: 1040
+              done()
+
+        it 'should set corret orientation for resized image', (done) ->
+          @timeout 10000
+          image.src = __dirname + '/assets/rotate.jpg'
+          image.resize JSON.parse(JSON.stringify(versions[1])), (err, version) ->
+            assert.ifError err
+            gm(version.src).identify (err, value) ->
+              assert.ifError err
+              assert.equal value.Orientation, 'Undefined'
+              assert.equal value.size.width, 585
+              assert.equal value.size.height, 1040
+              done()
+
+        it 'should set colorspace to RGB for resized image', (done) ->
+          @timeout 10000
+          image.src = __dirname + '/assets/cmyk.jpg'
+          image.resize JSON.parse(JSON.stringify(versions[1])), (err, version) ->
+            assert.ifError err
+            gm(version.src).identify (err, value) ->
+              assert.ifError err
+              assert.equal value.Colorspace, 'RGB'
+              done()
+
+        it 'should set quality for resized image', (done) ->
+          @timeout 10000
+          versions[1].quality = 50
+          image.src = __dirname + '/assets/photo.jpg'
+          image.resize JSON.parse(JSON.stringify(versions[1])), (err, version) ->
+            assert.ifError err
+            gm(version.src).identify (err, value) ->
+              assert.ifError err
+              assert.equal value.Quality, versions[1].quality
+              done()
 
       describe '#upload()', ->
         it 'should not upload original image if keepOriginal is set to false'
