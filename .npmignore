@@ -22,6 +22,8 @@ utils/
 
 Vagrantfile
 
+.gitignore
+.npmignore
 .DS_Store
 .idea
 *.iml
