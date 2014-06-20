@@ -81,9 +81,10 @@ var client = new Upload('my_s3_bucket', {
   * object[] `versions` - original and resized images with path/location
   * object `meta` - metadata for original image
 
+#### Example
 
 ```javascript
-client.upload('/tmp/some/file', function(err, images, exifData) {
+client.upload('/some/file/path.jpg', {}, function(err, images, meta) {
   if (err) {
     console.error(err);
   } else {
