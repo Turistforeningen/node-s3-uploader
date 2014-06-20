@@ -246,6 +246,7 @@ describe 'Upload', ->
         it 'should set corret orientation for resized image', (done) ->
           @timeout 10000
           image.src = __dirname + '/assets/rotate.jpg'
+          image.meta.orientation = 'TopLeft'
           image.resize JSON.parse(JSON.stringify(versions[1])), (err, version) ->
             assert.ifError err
             gm(version.src).identify (err, value) ->
