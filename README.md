@@ -17,6 +17,9 @@ npm install s3-uploader --save
 
 * Node.JS >= v0.10
 * imagemagic
+* AWS credentials environment variables
+  * `AWS_ACCESS_KEY_ID`
+  * `AWS_SECRET_ACCESS_KEY`
 
 ## API
 
