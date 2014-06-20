@@ -77,6 +77,7 @@ Image.prototype.getMeta = (cb) ->
       compression: val.Compression
       quallity: val.Quality
       exif: val.Properties if @config.returnExif
+
     return cb null, @meta
 
 Image.prototype.resize = (version, cb) ->
@@ -98,12 +99,14 @@ Image.prototype.resize = (version, cb) ->
     ".#{version.format}"
   ].join('')
 
-  gm(@src)
+  img = gm(@src)
     .resize(version.maxWidth, version.maxHeight)
-    .autoOrient()
-    .colorspace('RGB')
     .quality(version.quality or @config.resizeQuality)
-    .write version.src, (err) ->
+    .autoOrient()
+
+  img.colorspace('RGB') if @meta.colorSpace isnt 'RGB'
+
+  img.write version.src, (err) ->
       return cb err if err
 
       version.width = version.maxWidth; delete version.maxWidth
