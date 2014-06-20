@@ -108,13 +108,4 @@ Where A is the original image uploaded by the user. An mpc image is created, B,
 which is used to crate the thumbnails C, D, and E.
 ```
 
-## ToDo
-
-* [ ] return image exif data
-* [ ] return correct image size for thumbnails
-* [ ] write S3 metadata defaults
-* [ ] write S3 metadata per upload
-* [ ] delete src image on request
-* [ ] async retries options
-* [ ] remove images
 
