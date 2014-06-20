@@ -17,7 +17,6 @@ Upload = module.exports = (awsBucketName, opts) ->
   @awsBucketUrl = opts?.awsBucketUrl
   @awsBucketAcl = opts?.awsBucketAcl or 'privat'
   @resizeQuality = opts?.resizeQuality or 70
-  @keepOriginal = opts?.keepOriginal or true
   @returnExif = opts?.returnExif or false
   @tmpDir = (opts?.tmpDir or require('os').tmpdir()) + '/'
   @tmpPrefix = 'gm-'
@@ -113,10 +112,6 @@ Image.prototype.resize = (version, cb) ->
       cb null, version
 
 Image.prototype.upload = (version, cb) ->
-  if version.original and @config.keepOriginal is false
-    delete version.suffix
-    return process.nextTick -> cb null, version
-
   options =
     Key: @dest + version.suffix + '.' + version.format
     ACL: version.awsImageAcl or @config.awsBucketAcl

@@ -69,7 +69,6 @@ describe 'Upload', ->
       assert.equal upload.awsBucketUrl, undefined
       assert.equal upload.awsBucketAcl, 'privat'
       assert.equal upload.resizeQuality, 70
-      assert.equal upload.keepOriginal, true
       assert.equal upload.returnExif, false
       assert.equal upload.tmpDir, '/tmp/'
       assert.equal upload.tmpPrefix, 'gm-'
@@ -278,7 +277,6 @@ describe 'Upload', ->
               done()
 
       describe '#upload()', ->
-        it 'should not upload original image if keepOriginal is set to false'
         it 'should set object Key to correct location on AWS S3'
         it 'should set ojbect ACL to specified ACL'
         it 'should set object ACL to default if not specified'
@@ -319,24 +317,19 @@ describe 'Upload', ->
 
           done()
 
-      it 'should not upload original of keepOriginal is false', (done) ->
+      it 'should not upload original if not in versions array', (done) ->
         @timeout 20000
-        upload.keepOriginal = false
+        upload.versions.shift()
         upload.upload __dirname + '/assets/photo.jpg', {}, (err, images, meta) ->
           assert.ifError err
 
           for image in images
             cleanup.push Key: image.path if image.path # clean up in AWS
 
-            if image.original
-              assert.equal typeof image.size, 'string'
-              assert.equal typeof image.etag, 'undefined'
-              assert.equal typeof image.path, 'undefined'
-              assert.equal typeof image.url, 'undefined'
-            else
-              assert.equal typeof image.etag, 'string'
-              assert.equal typeof image.path, 'string'
-              assert.equal typeof image.url, 'string'
+            assert.equal typeof image.original, 'undefined'
+            assert.equal typeof image.etag, 'string'
+            assert.equal typeof image.path, 'string'
+            assert.equal typeof image.url, 'string'
 
             assert.equal typeof image.src, 'string'
             assert.equal typeof image.format, 'string'
