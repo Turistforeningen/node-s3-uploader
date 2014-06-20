@@ -48,24 +48,25 @@ var Upload = require('s3-uploader');
 
 ```javascript
 var client = new Upload('my_s3_bucket', {
-  awsBucketPath: 'images/',
   awsBucketUrl: 'https://s3-eu-west-1.amazonaws.com/my_s3_bucket/',
+  awsBucketPath: 'images/',
   awsBucketAcl: 'public',
+
   versions: [{
     original: true
   },{
-    maxHeight: 1040,
-    maxWidth: 1040,
     suffix: '-large',
     quality: 80
+    maxHeight: 1040,
+    maxWidth: 1040,
   },{
+    suffix: '-medium',
     maxHeight: 780,
     maxWidth: 780
-    suffix: '-medium',
   },{
+    suffix: '-small',
     maxHeight: 320,
     maxWidth: 320
-    suffix: '-small',
   }]
 });
 ```
