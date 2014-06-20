@@ -108,4 +108,6 @@ Where A is the original image uploaded by the user. An mpc image is created, B,
 which is used to crate the thumbnails C, D, and E.
 ```
 
+## Lisence
 
+[MIT](https://github.com/Turistforeningen/node-s3-uploader/blob/master/LICENSE)
