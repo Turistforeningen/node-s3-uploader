@@ -41,7 +41,7 @@ beforeEach ->
 
     putObject = upload.s3.putObject
     upload.s3.putObject = (opts, cb) ->
-      process.nextTick -> cb null, ETag: hash('md5').update(rand(32)).digest('hex')
+      process.nextTick -> cb null, ETag: '"' + hash('md5').update(rand(32)).digest('hex') + '"'
 
 # Clean up S3 objects
 if process.env.INTEGRATION_TEST is 'true'
@@ -313,7 +313,7 @@ describe 'Upload', ->
             assert.equal typeof image.format, 'string'
             assert.equal typeof image.width, 'number'
             assert.equal typeof image.height, 'number'
-            assert.equal typeof image.etag, 'string'
+            assert /[0-9a-f]{32}/.test image.etag
             assert.equal typeof image.path, 'string'
             assert.equal typeof image.url, 'string'
 
@@ -329,14 +329,13 @@ describe 'Upload', ->
             cleanup.push Key: image.path if image.path # clean up in AWS
 
             assert.equal typeof image.original, 'undefined'
-            assert.equal typeof image.etag, 'string'
-            assert.equal typeof image.path, 'string'
-            assert.equal typeof image.url, 'string'
-
             assert.equal typeof image.src, 'string'
             assert.equal typeof image.format, 'string'
             assert.equal typeof image.width, 'number'
             assert.equal typeof image.height, 'number'
+            assert /[0-9a-f]{32}/.test image.etag
+            assert.equal typeof image.path, 'string'
+            assert.equal typeof image.url, 'string'
 
           done()
 

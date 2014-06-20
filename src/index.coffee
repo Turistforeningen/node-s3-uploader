@@ -125,7 +125,7 @@ Image.prototype.upload = (version, cb) ->
   @config.s3.putObject options, (err, data) =>
     return cb err if err
 
-    version.etag = data.ETag
+    version.etag = data.ETag.substr(1, data.ETag.length-2)
     version.path = options.Key
     version.url = @config.awsBucketUrl + version.path if @config.awsBucketUrl
 
