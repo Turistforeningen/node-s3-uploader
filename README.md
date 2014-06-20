@@ -25,6 +25,25 @@ npm install s3-uploader --save
 
 ```javascript
 var Upload = require('s3-uploader');
+```
+
+### new Upload(string `awsBucketName`, object `opts`)
+
+* string `awsBucketName` - name of Amazon S3 bucket
+* object `opts` - global upload options
+  * string `awsBucketUrl` - publicly accessible url to your bucket
+  * string `awsBucketPath` - path within your bucket (ex. "/images")
+  * string `awsBucketAcl` - default ACL for uploded images
+  * number `resizeQuality` - default resize quallity
+  * boolean `returnExif` - return exif data for original image
+  * string `tmpDir` - directory to store temporary files
+  * object[] `versions` - versions to upload to S3
+    * boolean `original` - if this is the original image
+    * string `suffix` - this is appended to the file name
+    * integer `quality` - resized image quality
+    * integer `maxWidth` - max width for resized image
+    * integer `maxHeight` - max height for resized image
+
 var client = new Upload('my_s3_bucket', {
   awsBucketPath: 'images/',
   awsBucketUrl: 'https://s3-eu-west-1.amazonaws.com/my_s3_bucket/',
