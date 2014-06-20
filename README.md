@@ -44,6 +44,9 @@ var Upload = require('s3-uploader');
     * integer `maxWidth` - max width for resized image
     * integer `maxHeight` - max height for resized image
 
+#### Example
+
+```javascript
 var client = new Upload('my_s3_bucket', {
   awsBucketPath: 'images/',
   awsBucketUrl: 'https://s3-eu-west-1.amazonaws.com/my_s3_bucket/',
