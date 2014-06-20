@@ -71,7 +71,16 @@ var client = new Upload('my_s3_bucket', {
 });
 ```
 
-### #upload()
+### #upload(string `src`, object `opts`, function `cb`)
+
+* string `src` - absolute path to source image to upload
+* object `opts` - local upload config options (overwrites global config)
+  * boolean `returnExif` - return exif data or not for this upload
+* function `cb` - callback function (Error `err`, object[] `images`, object `meta`)
+  * Error `err` - `null` if everything went fine
+  * object[] `versions` - original and resized images with path/location
+  * object `meta` - metadata for original image
+
 
 ```javascript
 client.upload('/tmp/some/file', function(err, images, exifData) {
