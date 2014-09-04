@@ -20,10 +20,13 @@ Upload = module.exports = (awsBucketName, opts) ->
   @awsBucketPath = opts?.awsBucketPath or ''
   @awsBucketUrl = opts?.awsBucketUrl
   @awsBucketAcl = opts?.awsBucketAcl or 'privat'
+
   @resizeQuality = opts?.resizeQuality or 70
   @returnExif = opts?.returnExif or false
   @tmpDir = (opts?.tmpDir or require('os').tmpdir()) + '/'
   @tmpPrefix = 'gm-'
+
+  @asyncLimit = opts?.asyncLimit or 2
 
   @
 
@@ -149,7 +152,7 @@ Image.prototype.exec = (cb) ->
   @getMeta (err) =>
     return cb err if err
     versions = JSON.parse(JSON.stringify(@config.versions))
-    async.mapLimit versions, 2, @resizeAndUpload.bind(@), (err, versions) =>
+    async.mapLimit versions, @config.asyncLimit, @resizeAndUpload.bind(@), (err, versions) =>
       return cb err if err
       return cb null, versions, @meta
 

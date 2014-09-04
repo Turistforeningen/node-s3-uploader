@@ -39,6 +39,7 @@ var Upload = require('s3-uploader');
   * number `resizeQuality` - default resize quallity
   * boolean `returnExif` - return exif data for original image
   * string `tmpDir` - directory to store temporary files
+  * number `asyncLimit` - limit number of async workers
   * object[] `versions` - versions to upload to S3
     * boolean `original` - if this is the original image
     * string `suffix` - this is appended to the file name

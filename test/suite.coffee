@@ -72,6 +72,7 @@ describe 'Upload', ->
       assert.equal upload.returnExif, false
       assert.equal upload.tmpDir, '/tmp/'
       assert.equal upload.tmpPrefix, 'gm-'
+      assert.equal upload.asyncLimit, 2
 
     it 'should override default values'
 
