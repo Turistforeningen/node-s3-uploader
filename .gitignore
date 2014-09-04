@@ -25,3 +25,5 @@ lib/
 *.sublime*
 *.sublime-project
 *.sublime-workspace
+*.cache
+*.mpc
