@@ -87,6 +87,16 @@ Image.prototype.getMeta = (cb) ->
 
     return cb null, @meta
 
+Image.prototype.makeMpc = (cb) ->
+  @gm.write @src + '.mpc', (err) ->
+    return cb err if err
+
+    @gm = gm @src + '.mpc'
+
+    return cb null
+
+
+
 Image.prototype.resize = (version, cb) ->
   if version.original
     version.src = @src
@@ -150,9 +160,10 @@ Image.prototype.resizeAndUpload = (version, cb) ->
 
 Image.prototype.exec = (cb) ->
   @getMeta (err) =>
-    return cb err if err
-    versions = JSON.parse(JSON.stringify(@config.versions))
-    async.mapLimit versions, @config.asyncLimit, @resizeAndUpload.bind(@), (err, versions) =>
+    @makeMpc (err) =>
       return cb err if err
-      return cb null, versions, @meta
+      versions = JSON.parse(JSON.stringify(@config.versions))
+      async.mapSeries versions, @resizeAndUpload.bind(@), (err, versions) =>
+        return cb err if err
+        return cb null, versions, @meta
 
