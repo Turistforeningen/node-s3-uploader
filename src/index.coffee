@@ -95,8 +95,6 @@ Image.prototype.makeMpc = (cb) ->
 
     return cb null
 
-
-
 Image.prototype.resize = (version, cb) ->
   if version.original
     version.src = @src
