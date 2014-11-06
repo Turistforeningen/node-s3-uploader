@@ -59,7 +59,7 @@ var client = new Upload('my_s3_bucket', {
     original: true
   },{
     suffix: '-large',
-    quality: 80
+    quality: 80,
     maxHeight: 1040,
     maxWidth: 1040,
   },{
