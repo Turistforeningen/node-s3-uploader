@@ -68,12 +68,12 @@ Image = Upload.Image = (src, dest, opts, config) ->
   @returnExif = opts.returnExif or config.returnExif
 
   @meta = {}
-  @gm = null
+  @gm = gm @src
 
   @
 
 Image.prototype.getMeta = (cb) ->
-  @gm = gm(@src).identify (err, val) =>
+  @gm.identify (err, val) =>
     return cb err if err
     @meta =
       format: val.format.toLowerCase()
@@ -116,7 +116,7 @@ Image.prototype.resize = (version, cb) ->
     ".#{version.format}"
   ].join('')
 
-  img = gm(@src)
+  img = @gm
     .resize(version.maxWidth, version.maxHeight)
     .quality(version.quality or @config.resizeQuality)
 
