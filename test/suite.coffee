@@ -129,7 +129,7 @@ describe 'Upload', ->
           assert.equal image.dest, 'images_test/Wm/PH/f3/I0'
           assert /[a-z0-9]{24}/.test image.tmpName
           assert.deepEqual image.meta, {}
-          assert.equal image.gm, null
+          assert.equal typeof image.gm, 'object'
 
       describe '#getMeta()', ->
         it 'should return image metadata', (done) ->
@@ -184,6 +184,7 @@ describe 'Upload', ->
           versions[0].suffix = ''
 
           image.src = __dirname + '/assets/photo.jpg'
+          image.gm = gm image.src
           image.tmpName = 'ed8d8b72071e731dc9065095c92c3e384d7c1e27'
           image.meta =
             format: 'jpeg'
@@ -247,6 +248,7 @@ describe 'Upload', ->
         it 'should set corret orientation for resized image', (done) ->
           @timeout 10000
           image.src = __dirname + '/assets/rotate.jpg'
+          image.gm = gm image.src
           image.meta.orientation = 'TopLeft'
           image.resize JSON.parse(JSON.stringify(versions[1])), (err, version) ->
             assert.ifError err
@@ -260,6 +262,7 @@ describe 'Upload', ->
         it 'should set colorspace to RGB for resized image', (done) ->
           @timeout 10000
           image.src = __dirname + '/assets/cmyk.jpg'
+          image.gm = gm image.src
           image.meta.colorSpace = 'CMYK'
           image.resize JSON.parse(JSON.stringify(versions[1])), (err, version) ->
             assert.ifError err
@@ -272,6 +275,7 @@ describe 'Upload', ->
           @timeout 10000
           versions[1].quality = 50
           image.src = __dirname + '/assets/photo.jpg'
+          image.gm = gm image.src
           image.resize JSON.parse(JSON.stringify(versions[1])), (err, version) ->
             assert.ifError err
             gm(version.src).identify (err, value) ->
