@@ -245,7 +245,7 @@ describe 'Upload', ->
                 height: 1040
               done()
 
-        it 'should set corret orientation for resized image', (done) ->
+        it 'should set correct orientation for resized image', (done) ->
           @timeout 10000
           image.src = __dirname + '/assets/rotate.jpg'
           image.gm = gm image.src
