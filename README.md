@@ -27,25 +27,25 @@ npm install s3-uploader --save
 var Upload = require('s3-uploader');
 ```
 
-### new Upload(string `awsBucketName`, object `opts`)
+### new Upload(`string` awsBucketName, `object` opts)
 
-* string `awsBucketName` - name of Amazon S3 bucket
-* object `opts` - global upload options
-  * string `awsBucketUrl` - publicly accessible url to your bucket
-  * string `awsBucketPath` - path within your bucket (ex. "/images")
-  * string `awsBucketAcl` - default ACL for uploded images
-  * number `awsMaxRetries` - max number of retries; default 3
-  * number `awsHttpTimeout` - inactive time (ms) beofre timing out; default 1000
-  * number `resizeQuality` - default resize quallity
-  * boolean `returnExif` - return exif data for original image
-  * string `tmpDir` - directory to store temporary files
-  * number `asyncLimit` - limit number of async workers
-  * object[] `versions` - versions to upload to S3
-    * boolean `original` - if this is the original image
-    * string `suffix` - this is appended to the file name
-    * integer `quality` - resized image quality
-    * integer `maxWidth` - max width for resized image
-    * integer `maxHeight` - max height for resized image
+* `string` awsBucketName - name of Amazon S3 bucket
+* `object` opts - global upload options
+  * `string` awsBucketUrl - publicly accessible url to your bucket
+  * `string` awsBucketPath - path within your bucket (ex. "/images")
+  * `string` awsBucketAcl - default ACL for uploded images
+  * `number` awsMaxRetries - max number of retries; default 3
+  * `number` awsHttpTimeout - inactive time (ms) beofre timing out; default 1000
+  * `number` resizeQuality - default resize quallity
+  * `boolean` returnExif - return exif data for original image
+  * `string` tmpDir - directory to store temporary files
+  * `number` asyncLimit - limit number of async workers
+  * `object[]` versions - versions to upload to S3
+    * `boolean` original - if this is the original image
+    * `string` suffix - this is appended to the file name
+    * `number` quality - resized image quality
+    * `number` maxWidth - max width for resized image
+    * `number` maxHeight - max height for resized image
 
 #### Example
 
@@ -74,14 +74,14 @@ var client = new Upload('my_s3_bucket', {
 });
 ```
 
-### #upload(string `src`, object `opts`, function `cb`)
+### #upload(`string` src, `object` opts, `function` cb)
 
-* string `src` - absolute path to source image to upload
-* object `opts` - local upload config options (overwrites global config)
-* function `cb` - callback function (Error `err`, object[] `images`, object `meta`)
-  * Error `err` - `null` if everything went fine
-  * object[] `versions` - original and resized images with path/location
-  * object `meta` - metadata for original image
+* `string` src - absolute path to source image to upload
+* `object` opts - local upload config options (overwrites global config)
+* `function` cb - callback function (`Error` err, `object[]` versions, `object` meta)
+  * `Error` err - `null` if everything went fine
+  * `object[]` versions - original and resized images with path/location
+  * `object` meta - metadata for original image
 
 #### Example
 
