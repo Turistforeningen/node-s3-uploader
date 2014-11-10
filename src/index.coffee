@@ -65,7 +65,6 @@ Image = Upload.Image = (src, dest, opts, config) ->
   @tmpName = hash('sha1').update(rand(128)).digest('hex')
 
   @opts = opts or {}
-  @returnExif = opts.returnExif or config.returnExif
 
   @meta = {}
   @gm = gm @src
