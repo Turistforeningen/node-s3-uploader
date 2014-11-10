@@ -1,6 +1,6 @@
 {
   "name": "s3-uploader",
-  "version": "0.4.1",
+  "version": "0.4.2",
   "description": "Resize, rename, and upload images to AWS S3",
   "main": "lib/index.js",
   "directories": {
