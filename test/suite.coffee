@@ -71,7 +71,7 @@ describe 'Upload', ->
       assert upload.s3 instanceof require('aws-sdk').S3
       assert upload.versions instanceof Array
       assert.equal upload.awsBucketPath, ''
-      assert.equal upload.awsBucketUrl, 'https://s3-us-east-1.amazonaws.com/myBucket'
+      assert.equal upload.awsBucketUrl, 'https://s3-us-east-1.amazonaws.com/myBucket/'
       assert.equal upload.awsBucketAcl, 'privat'
       assert.equal upload.resizeQuality, 70
       assert.equal upload.returnExif, false
@@ -345,6 +345,8 @@ describe 'Integration Tests', ->
         assert /[0-9a-f]{32}/.test image.etag
         assert.equal typeof image.path, 'string'
         assert.equal typeof image.url, 'string'
+
+        console.log image.url
 
       done()
 

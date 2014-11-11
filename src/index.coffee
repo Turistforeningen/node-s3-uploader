@@ -19,7 +19,7 @@ Upload = module.exports = (awsBucketName, opts) ->
   @versions = opts?.versions or []
 
   @awsBucketPath = opts?.awsBucketPath or ''
-  @awsBucketUrl = "https://s3-#{opts?.awsBucketRegion or 'us-east-1'}.amazonaws.com/#{awsBucketName}"
+  @awsBucketUrl = "https://s3-#{opts?.awsBucketRegion or 'us-east-1'}.amazonaws.com/#{awsBucketName}/"
   @awsBucketAcl = opts?.awsBucketAcl or 'privat'
 
   @resizeQuality = opts?.resizeQuality or 70
