@@ -15,8 +15,8 @@ COLOR = if process.env.DRONE then 'RGB' else 'sRGB'
 
 beforeEach ->
   upload = new Upload process.env.AWS_BUCKET_NAME,
-    awsBucketPath: 'images_test/'
-    awsBucketRegion: 'eu-west-1'
+    awsBucketPath: process.env.AWS_BUCKET_PATH
+    awsBucketRegion: process.env.AWS_BUCKET_REGION
     awsBucketAcl: 'public-read'
     versions: [{
       original: true

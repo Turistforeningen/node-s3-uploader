@@ -18,6 +18,8 @@ echo "Setting environment variables..."
 
 echo "export NODE_ENV=development"                          >> /home/vagrant/.bashrc
 echo "export AWS_BUCKET_NAME=$AWS_BUCKET_NAME"              >> /home/vagrant/.bashrc
+echo "export AWS_BUCKET_PATH=images_test/"                  >> /home/vagrant/.bashrc
+echo "export AWS_BUCKET_REGION=eu-west-1"                   >> /home/vagrant/.bashrc
 echo "export AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID"          >> /home/vagrant/.bashrc
 echo "export AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY"  >> /home/vagrant/.bashrc
 echo "\ncd /vagrant"                                        >> /home/vagrant/.bashrc
