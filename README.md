@@ -51,7 +51,7 @@ var Upload = require('s3-uploader');
 
 ```javascript
 var client = new Upload('my_s3_bucket', {
-  awsBucketUrl: 'https://s3-eu-west-1.amazonaws.com/my_s3_bucket/',
+  awsBucketRegion: 'us-east-1',
   awsBucketPath: 'images/',
   awsBucketAcl: 'public-read',
 
