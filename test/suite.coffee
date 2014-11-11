@@ -46,6 +46,8 @@ beforeEach ->
 # Clean up S3 objects
 if process.env.INTEGRATION_TEST is 'true'
   afterEach (done) ->
+    @timeout 40000
+
     return process.nextTick done if cleanup.length is 0
 
     upload.s3.deleteObjects Delete: Objects: cleanup, (err) ->
