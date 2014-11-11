@@ -122,6 +122,8 @@ describe 'Image', ->
 
     image = new Upload.Image src, dest, opts, upload
 
+  SIZE = if process.env.DRONE then 'KBB' else 'KB'
+
   describe 'constructor', ->
     it 'should set default values', ->
       assert image instanceof Upload.Image
@@ -138,7 +140,7 @@ describe 'Image', ->
       image.getMeta (err, meta) ->
         assert.ifError err
         assert.equal meta.format, 'jpeg'
-        assert.equal meta.fileSize, '617KB'
+        assert.equal meta.fileSize, '617' + SIZE
         assert.equal meta.imageSize.width, 1536
         assert.equal meta.imageSize.height, 2048
         assert.equal meta.orientation, 'Undefined'
@@ -153,7 +155,7 @@ describe 'Image', ->
       image.getMeta (err) ->
         assert.ifError err
         assert.equal image.meta.format, 'jpeg'
-        assert.equal image.meta.fileSize, '617KB'
+        assert.equal image.meta.fileSize, '617' + SIZE
         assert.equal image.meta.imageSize.width, 1536
         assert.equal image.meta.imageSize.height, 2048
         assert.equal image.meta.orientation, 'Undefined'
@@ -189,7 +191,7 @@ describe 'Image', ->
       image.tmpName = 'ed8d8b72071e731dc9065095c92c3e384d7c1e27'
       image.meta =
         format: 'jpeg'
-        fileSize: '617KBB'
+        fileSize: '617' + SIZE
         imageSize: width: 1536, height: 2048
         orientation: 'Undefined'
         colorSpace: 'RGB'
