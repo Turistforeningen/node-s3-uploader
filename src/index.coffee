@@ -118,7 +118,7 @@ Image.prototype.resize = (version, cb) ->
     .quality(version.quality or @config.resizeQuality)
 
   img.autoOrient() if @meta.orientation
-  img.colorspace('RGB') if @meta.colorSpace isnt 'RGB'
+  img.colorspace('RGB') if @meta.colorSpace not in ['RGB', 'sRGB']
 
   img.write version.src, (err) ->
       return cb err if err
