@@ -10,6 +10,7 @@ Upload = module.exports = (awsBucketName, opts) ->
   throw new Error 'Bucket name can not be undefined' if not awsBucketName
 
   @s3 = new S3
+    region: opts?.awsBucketRegion or 'us-east-1'
     maxRetries: opts?.awsMaxRetries or 3
     sslEnabled: true
     httpOptions: timeout: opts?.awsHttpTimeout or 10000
@@ -18,7 +19,7 @@ Upload = module.exports = (awsBucketName, opts) ->
   @versions = opts?.versions or []
 
   @awsBucketPath = opts?.awsBucketPath or ''
-  @awsBucketUrl = opts?.awsBucketUrl
+  @awsBucketUrl = "https://s3-#{opts?.awsBucketRegion or 'us-east-1'}.amazonaws.com/#{awsBucketName}"
   @awsBucketAcl = opts?.awsBucketAcl or 'privat'
 
   @resizeQuality = opts?.resizeQuality or 70

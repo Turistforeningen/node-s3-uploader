@@ -31,7 +31,7 @@ var Upload = require('s3-uploader');
 
 * `string` awsBucketName - name of Amazon S3 bucket
 * `object` opts - global upload options
-  * `string` awsBucketUrl - publicly accessible url to your bucket
+  * `string` awsBuckeRegion - region for you bucket; default "us-east-1"
   * `string` awsBucketPath - path within your bucket (ex. "/images")
   * `string` awsBucketAcl - default ACL for uploded images
   * `number` awsMaxRetries - max number of retries; default 3
