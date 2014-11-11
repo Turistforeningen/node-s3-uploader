@@ -10,6 +10,9 @@ rand = require('crypto').pseudoRandomBytes
 upload = listObjects = putObject = null
 cleanup = []
 
+SIZE = if process.env.DRONE then 'KBB' else 'KB'
+COLOR = if process.env.DRONE then 'RGB' else 'sRGB'
+
 beforeEach ->
   upload = new Upload process.env.AWS_BUCKET_NAME,
     awsBucketPath: 'images_test/'
@@ -122,8 +125,6 @@ describe 'Image', ->
 
     image = new Upload.Image src, dest, opts, upload
 
-  SIZE = if process.env.DRONE then 'KBB' else 'KB'
-
   describe 'constructor', ->
     it 'should set default values', ->
       assert image instanceof Upload.Image
@@ -144,7 +145,7 @@ describe 'Image', ->
         assert.equal meta.imageSize.width, 1536
         assert.equal meta.imageSize.height, 2048
         assert.equal meta.orientation, 'Undefined'
-        assert.equal meta.colorSpace, 'sRGB'
+        assert.equal meta.colorSpace, COLOR
         assert.equal meta.compression, 'JPEG'
         assert.equal meta.quallity, '96'
         assert.equal meta.exif, undefined
@@ -159,7 +160,7 @@ describe 'Image', ->
         assert.equal image.meta.imageSize.width, 1536
         assert.equal image.meta.imageSize.height, 2048
         assert.equal image.meta.orientation, 'Undefined'
-        assert.equal image.meta.colorSpace, 'sRGB'
+        assert.equal image.meta.colorSpace, COLOR
         assert.equal image.meta.compression, 'JPEG'
         assert.equal image.meta.quallity, '96'
         assert.equal image.meta.exif, undefined
@@ -271,7 +272,7 @@ describe 'Image', ->
         assert.ifError err
         gm(version.src).identify (err, value) ->
           assert.ifError err
-          assert.equal value.Colorspace, 'sRGB'
+          assert.equal value.Colorspace, COLOR
           done()
 
     it 'should set quality for resized image', (done) ->
