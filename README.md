@@ -35,7 +35,7 @@ var Upload = require('s3-uploader');
   * `string` awsBucketPath - path within your bucket (ex. "/images")
   * `string` awsBucketAcl - default ACL for uploded images
   * `number` awsMaxRetries - max number of retries; default 3
-  * `number` awsHttpTimeout - inactive time (ms) beofre timing out; default 1000
+  * `number` awsHttpTimeout - inactive time (ms) beofre timing out; default 10000
   * `number` resizeQuality - default resize quallity
   * `boolean` returnExif - return exif data for original image
   * `string` tmpDir - directory to store temporary files

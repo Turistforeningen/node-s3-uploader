@@ -12,7 +12,7 @@ Upload = module.exports = (awsBucketName, opts) ->
   @s3 = new S3
     maxRetries: opts?.awsMaxRetries or 3
     sslEnabled: true
-    httpOptions: timeout: opts?.awsHttpTimeout or 1000
+    httpOptions: timeout: opts?.awsHttpTimeout or 10000
     params: Bucket: awsBucketName
 
   @versions = opts?.versions or []
