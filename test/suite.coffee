@@ -346,7 +346,5 @@ describe 'Integration Tests', ->
         assert.equal typeof image.path, 'string'
         assert.equal typeof image.url, 'string'
 
-        console.log image.url
-
       done()
 
