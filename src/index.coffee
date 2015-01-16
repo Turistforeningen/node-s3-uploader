@@ -1,7 +1,7 @@
 S3 = require('aws-sdk').S3
 fs = require 'fs'
 gm = require('gm').subClass imageMagick: true
-async = require 'async'
+mapLimit = require('async').mapLimit
 
 hash = require('crypto').createHash
 rand = require('crypto').pseudoRandomBytes
@@ -163,8 +163,8 @@ Image.prototype.exec = (cb) ->
   @getMeta (err) =>
     @makeMpc (err) =>
       return cb err if err
-      versions = JSON.parse(JSON.stringify(@config.versions))
-      async.mapSeries versions, @resizeAndUpload.bind(@), (err, versions) =>
+      versions = JSON.parse(JSON.stringify(@config.opts.versions))
+      mapLimit versions, @config.opts.workers, @resizeAndUpload.bind(@), (err, versions) =>
         return cb err if err
         return cb null, versions, @meta
 
