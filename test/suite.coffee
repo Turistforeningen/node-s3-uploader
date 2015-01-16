@@ -86,7 +86,10 @@ describe 'Upload', ->
       assert.equal upload.opts.workers, 1
       assert.equal upload.opts.url, 'https://s3-us-east-1.amazonaws.com/myBucket/'
 
-    it 'should set custom url'
+    it 'should set custom url', ->
+      upload = new Upload 'myBucket', url: 'http://cdn.app.com/'
+      assert.equal upload.opts.url, 'http://cdn.app.com/'
+
     it 'should override default values'
 
   describe '#_getRandomPath()', ->
