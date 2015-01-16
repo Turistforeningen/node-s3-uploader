@@ -6,28 +6,28 @@ async = require 'async'
 hash = require('crypto').createHash
 rand = require('crypto').pseudoRandomBytes
 
-Upload = module.exports = (awsBucketName, opts) ->
+Upload = module.exports = (awsBucketName, opts = {}) ->
   throw new Error 'Bucket name can not be undefined' if not awsBucketName
 
   @s3 = new S3
-    region: opts?.awsBucketRegion or 'us-east-1'
-    maxRetries: opts?.awsMaxRetries or 3
+    region: opts.awsBucketRegion or 'us-east-1'
+    maxRetries: opts.awsMaxRetries or 3
     sslEnabled: true
-    httpOptions: timeout: opts?.awsHttpTimeout or 10000
+    httpOptions: timeout: opts.awsHttpTimeout or 10000
     params: Bucket: awsBucketName
 
-  @versions = opts?.versions or []
+  @versions = opts.versions or []
 
-  @awsBucketPath = opts?.awsBucketPath or ''
-  @awsBucketUrl = "https://s3-#{opts?.awsBucketRegion or 'us-east-1'}.amazonaws.com/#{awsBucketName}/"
-  @awsBucketAcl = opts?.awsBucketAcl or 'privat'
+  @awsBucketPath = opts.awsBucketPath or ''
+  @awsBucketUrl = "https://s3-#{opts.awsBucketRegion or 'us-east-1'}.amazonaws.com/#{awsBucketName}/"
+  @awsBucketAcl = opts.awsBucketAcl or 'privat'
 
-  @resizeQuality = opts?.resizeQuality or 70
-  @returnExif = opts?.returnExif or false
-  @tmpDir = (opts?.tmpDir or require('os').tmpdir()) + '/'
+  @resizeQuality = opts.resizeQuality or 70
+  @returnExif = opts.returnExif or false
+  @tmpDir = (opts.tmpDir or require('os').tmpdir()) + '/'
   @tmpPrefix = 'gm-'
 
-  @asyncLimit = opts?.asyncLimit or 2
+  @asyncLimit = opts.asyncLimit or 2
 
   @
 
