@@ -6,28 +6,31 @@ async = require 'async'
 hash = require('crypto').createHash
 rand = require('crypto').pseudoRandomBytes
 
-Upload = module.exports = (awsBucketName, opts = {}) ->
+Upload = module.exports = (awsBucketName, @opts = {}) ->
   throw new Error 'Bucket name can not be undefined' if not awsBucketName
 
+  @opts.awsBucketRegion ?= 'us-east-1'
+  @opts.awsBucketPath   ?= ''
+  @opts.awsBucketAcl    ?= 'privat'
+  @opts.awsMaxRetries   ?= 3
+  @opts.awsHttpTimeout  ?= 10000
+
+  @opts.versions        ?= []
+  @opts.resizeQuality   ?= 70
+  @opts.returnExif      ?= false
+
+  @opts.tmpDir          ?= require('os').tmpdir() + '/'
+  @opts.tmpPrefix       ?= 'gm-'
+
+  @opts.workers         ?= 1
+  @opts.url ?= "https://s3-#{@opts.awsBucketRegion}.amazonaws.com/#{awsBucketName}/"
+
   @s3 = new S3
-    region: opts.awsBucketRegion or 'us-east-1'
-    maxRetries: opts.awsMaxRetries or 3
+    region: @opts.awsBucketRegion
+    maxRetries: @opts.awsMaxRetries
     sslEnabled: true
-    httpOptions: timeout: opts.awsHttpTimeout or 10000
+    httpOptions: timeout: @opts.awsHttpTimeout
     params: Bucket: awsBucketName
-
-  @versions = opts.versions or []
-
-  @awsBucketPath = opts.awsBucketPath or ''
-  @awsBucketUrl = "https://s3-#{opts.awsBucketRegion or 'us-east-1'}.amazonaws.com/#{awsBucketName}/"
-  @awsBucketAcl = opts.awsBucketAcl or 'privat'
-
-  @resizeQuality = opts.resizeQuality or 70
-  @returnExif = opts.returnExif or false
-  @tmpDir = (opts.tmpDir or require('os').tmpdir()) + '/'
-  @tmpPrefix = 'gm-'
-
-  @asyncLimit = opts.asyncLimit or 2
 
   @
 
@@ -40,7 +43,7 @@ Upload.prototype._getRandomPath = ->
     y = input[Math.floor((Math.random() * input.length))]
     res.push x + y
 
-  return @awsBucketPath + res.join '/'
+  return @opts.awsBucketPath + res.join '/'
 
 Upload.prototype._uploadPathIsAvailable = (path, callback) ->
   @s3.listObjects Prefix: path, (err, data) ->
@@ -83,7 +86,7 @@ Image.prototype.getMeta = (cb) ->
       colorSpace: val.Colorspace
       compression: val.Compression
       quallity: val.Quality
-      exif: val.Properties if @config.returnExif
+      exif: val.Properties if @config.opts.returnExif
 
     return cb null, @meta
 
@@ -107,8 +110,8 @@ Image.prototype.resize = (version, cb) ->
 
   version.format = 'jpeg'
   version.src = [
-    @config.tmpDir
-    @config.tmpPrefix
+    @config.opts.tmpDir
+    @config.opts.tmpPrefix
     @tmpName
     version.suffix
     ".#{version.format}"
@@ -116,7 +119,7 @@ Image.prototype.resize = (version, cb) ->
 
   img = @gm
     .resize(version.maxWidth, version.maxHeight)
-    .quality(version.quality or @config.resizeQuality)
+    .quality(version.quality or @config.opts.resizeQuality)
 
   img.autoOrient() if @meta.orientation
   img.colorspace('RGB') if @meta.colorSpace not in ['RGB', 'sRGB']
@@ -132,7 +135,7 @@ Image.prototype.resize = (version, cb) ->
 Image.prototype.upload = (version, cb) ->
   options =
     Key: @dest + version.suffix + '.' + version.format
-    ACL: version.awsImageAcl or @config.awsBucketAcl
+    ACL: version.awsImageAcl or @config.opts.awsBucketAcl
     Body: fs.createReadStream(version.src)
     ContentType: 'image/' + version.format
     Metadata: @opts.metadata or {}
@@ -142,7 +145,7 @@ Image.prototype.upload = (version, cb) ->
 
     version.etag = data.ETag.substr(1, data.ETag.length-2)
     version.path = options.Key
-    version.url = @config.awsBucketUrl + version.path if @config.awsBucketUrl
+    version.url = @config.opts.url + version.path if @config.opts.url
 
     delete version.awsImageAcl
     delete version.suffix

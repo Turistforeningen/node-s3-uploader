@@ -69,16 +69,24 @@ describe 'Upload', ->
       upload = new Upload 'myBucket'
 
       assert upload.s3 instanceof require('aws-sdk').S3
-      assert upload.versions instanceof Array
-      assert.equal upload.awsBucketPath, ''
-      assert.equal upload.awsBucketUrl, 'https://s3-us-east-1.amazonaws.com/myBucket/'
-      assert.equal upload.awsBucketAcl, 'privat'
-      assert.equal upload.resizeQuality, 70
-      assert.equal upload.returnExif, false
-      assert.equal upload.tmpDir, '/tmp/'
-      assert.equal upload.tmpPrefix, 'gm-'
-      assert.equal upload.asyncLimit, 2
 
+      assert.equal upload.opts.awsBucketRegion, 'us-east-1'
+      assert.equal upload.opts.awsBucketPath, ''
+      assert.equal upload.opts.awsBucketAcl, 'privat'
+      assert.equal upload.opts.awsMaxRetries, 3
+      assert.equal upload.opts.awsHttpTimeout, 10000
+
+      assert upload.opts.versions instanceof Array
+      assert.equal upload.opts.resizeQuality, 70
+      assert.equal upload.opts.returnExif, false
+
+      assert.equal upload.opts.tmpDir, '/tmp/'
+      assert.equal upload.opts.tmpPrefix, 'gm-'
+
+      assert.equal upload.opts.workers, 1
+      assert.equal upload.opts.url, 'https://s3-us-east-1.amazonaws.com/myBucket/'
+
+    it 'should set custom url'
     it 'should override default values'
 
   describe '#_getRandomPath()', ->
@@ -168,7 +176,7 @@ describe 'Image', ->
 
     it 'should return exif data if returnExif is set to true', (done) ->
       @timeout 10000
-      image.config.returnExif = true
+      image.config.opts.returnExif = true
       image.getMeta (err) ->
         assert.ifError err
         assert.equal typeof image.meta.exif, 'object'
@@ -184,7 +192,7 @@ describe 'Image', ->
   describe '#resize()', ->
     versions = null
     beforeEach ->
-      versions = JSON.parse JSON.stringify upload.versions
+      versions = JSON.parse JSON.stringify upload.opts.versions
       versions[0].suffix = ''
 
       image.src = __dirname + '/assets/photo.jpg'
@@ -330,7 +338,7 @@ describe 'Integration Tests', ->
 
   it 'should not upload original if not in versions array', (done) ->
     @timeout 40000
-    upload.versions.shift()
+    upload.opts.versions.shift()
     upload.upload __dirname + '/assets/photo.jpg', {}, (err, images, meta) ->
       assert.ifError err
 
