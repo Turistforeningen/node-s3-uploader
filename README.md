@@ -1,6 +1,8 @@
 AWS S3 Image Uploader [![Build Status](https://drone.io/github.com/Turistforeningen/node-s3-uploader/status.png)](https://drone.io/github.com/Turistforeningen/node-s3-uploader/latest)
 =====================
 
+[![Join the chat at https://gitter.im/Turistforeningen/node-s3-uploader](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/Turistforeningen/node-s3-uploader?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 [![NPM](https://nodei.co/npm/s3-uploader.png?downloads=true)](https://www.npmjs.org/package/s3-uploader)
 
 Flexible and efficient resize, rename, and upload images to Amazon S3 disk
