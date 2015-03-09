@@ -41,7 +41,7 @@
   },
   "dependencies": {
     "async": "~0.9",
-    "aws-sdk": "~2.0",
+    "aws-sdk": "~2.1",
     "gm": "~1.17"
   }
 }
