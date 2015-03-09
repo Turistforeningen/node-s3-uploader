@@ -4,7 +4,7 @@ AWS S3 Image Uploader
 [![Build Status](https://drone.io/github.com/Turistforeningen/node-s3-uploader/status.png)](https://drone.io/github.com/Turistforeningen/node-s3-uploader/latest)
 [![npm](https://img.shields.io/npm/dm/s3-uploader.svg)]()
 [![npm](https://img.shields.io/npm/v/s3-uploader.svg)]()
-[![node](https://img.shields.io/node/v/gh-badges.svg)]()
+[![node](https://img.shields.io/node/v/s3-uploader.svg)]()
 
 Flexible and efficient resize, rename, and upload images to Amazon S3 disk
 storage. Uses the official [AWS Node SDK](http://aws.amazon.com/sdkfornodejs/)
