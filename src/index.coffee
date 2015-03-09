@@ -26,6 +26,9 @@ Upload = module.exports = (awsBucketName, @opts = {}) ->
   @opts.url ?= "https://s3-#{@opts.awsBucketRegion}.amazonaws.com/#{awsBucketName}/"
 
   @s3 = new S3
+    accessKeyId: @opts.awsAccessKeyId
+    secretAccessKey: @opts.awsSecretAccessKey
+
     region: @opts.awsBucketRegion
     maxRetries: @opts.awsMaxRetries
     sslEnabled: true

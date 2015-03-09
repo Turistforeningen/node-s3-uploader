@@ -92,6 +92,26 @@ describe 'Upload', ->
 
     it 'should override default values'
 
+    it 'should connect to AWS S3 using environment variables', (done) ->
+      @timeout 10000
+
+      upload = new Upload process.env.AWS_BUCKET_NAME
+
+      upload.s3.headBucket Bucket: process.env.AWS_BUCKET_NAME, (err, data) ->
+        assert.ifError err
+        done()
+
+    it 'should connect to AWS S3 using constructor options', (done) ->
+      @timeout 10000
+
+      upload = new Upload process.env.AWS_BUCKET_NAME,
+        awsAccessKeyId: process.env.AWS_ACCESS_KEY_ID
+        awsSecretAccessKey: process.env.AWS_SECRET_ACCESS_KEY
+
+      upload.s3.headBucket Bucket: process.env.AWS_BUCKET_NAME, (err, data) ->
+        assert.ifError err
+        done()
+
   describe '#_getRandomPath()', ->
     it 'should return a new random path', ->
       path = upload._getRandomPath()

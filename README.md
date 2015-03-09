@@ -37,6 +37,8 @@ var Upload = require('s3-uploader');
 
 * `string` awsBucketName - name of Amazon S3 bucket
 * `object` opts - global upload options
+  * `string` awsAccessKeyId - your AWS access key ID
+  * `string` awsSecretAccessKey - your AWS secret access key
   * `string` awsBuckeRegion - region for you bucket; default "us-east-1"
   * `string` awsBucketPath - path within your bucket (ex. "/images")
   * `string` awsBucketAcl - default ACL for uploded images
