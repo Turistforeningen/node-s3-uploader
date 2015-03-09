@@ -38,11 +38,9 @@ beforeEach ->
 
   # Mock S3 API calls
   if process.env.INTEGRATION_TEST isnt 'true'
-    listObjects = upload.s3.listObjects
     upload.s3.listObjects = (path, cb) ->
       process.nextTick -> cb null, Contents: []
 
-    putObject = upload.s3.putObject
     upload.s3.putObject = (opts, cb) ->
       process.nextTick -> cb null, ETag: '"' + hash('md5').update(rand(32)).digest('hex') + '"'
 
