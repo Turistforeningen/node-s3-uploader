@@ -37,16 +37,16 @@ var Upload = require('s3-uploader');
 
 * **string** `awsBucketName` - name of Amazon S3 bucket
 * **object** `opts` - global upload options
-  * **number** `resizeQuality` - thumbnail resize quallity (default `70`)
-  * **boolean** `returnExif` - return exif data for original image (default `false`
-  * **string** `tmpDir` - directory to store temporary files (default `os.tmpdir()`
-  * **number** `workers` - number of async workers (default `1`)
-  * **string** `url` - custom public url (ex. "http://cdn.app.com/")
+  * **number** `resizeQuality` - thumbnail resize quallity (**default** `70`)
+  * **boolean** `returnExif` - return exif data for original image (**default** `false`)
+  * **string** `tmpDir` - directory to store temporary files (**default** `os.tmpdir()`)
+  * **number** `workers` - number of async workers (**default** `1`)
+  * **string** `url` - custom public url (**default** build from `region` and `awsBucketName`)
 
-  * **object** `aws` - aws specific options
-    * **string** `region` - region for you bucket; default "us-east-1"
-    * **string** `path` - path within your bucket (ex. "/images")
-    * **string** `acl` - default ACL for uploded images
+  * **object** `aws` - AWS SDK configuration optsion
+    * **string** `region` - region for you bucket (**default** `us-east-1`)
+    * **string** `path` - path within your bucket (**default** `""`)
+    * **string** `acl` - default ACL for uploded images (**default** `privat`)
     * **string** `accessKeyId` - AWS access key ID override
     * **string** `secretAccessKey` - AWS secret access key override
 
@@ -55,9 +55,9 @@ var Upload = require('s3-uploader');
 > in order to fine tune the connection – if you know what you are doing.
 
   * **object[]** `versions` - versions to upload to S3
-    * **boolean** `original` - if this is the original image
-    * **string** `suffix` - this is appended to the file name
-    * **number** `quality` - resized image quality
+    * **boolean** `original` - if this is the original image (**default** `false`)
+    * **string** `suffix` - this is appended to the file name (**default** `""`)
+    * **number** `quality` - resized image quality (**default** `resizeQuality`)
     * **number** `maxWidth` - max width for resized image
     * **number** `maxHeight` - max height for resized image
 
