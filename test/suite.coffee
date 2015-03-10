@@ -15,9 +15,10 @@ COLOR = if process.env.DRONE then 'RGB' else 'sRGB'
 
 beforeEach ->
   upload = new Upload process.env.AWS_BUCKET_NAME,
-    awsBucketPath: process.env.AWS_BUCKET_PATH
-    awsBucketRegion: process.env.AWS_BUCKET_REGION
-    awsBucketAcl: 'public-read'
+    aws:
+      path: process.env.AWS_BUCKET_PATH
+      region: process.env.AWS_BUCKET_REGION
+      acl: 'public-read'
     versions: [{
       original: true
       awsImageAcl: 'private'
@@ -68,11 +69,11 @@ describe 'Upload', ->
 
       assert upload.s3 instanceof require('aws-sdk').S3
 
-      assert.equal upload.opts.awsBucketRegion, 'us-east-1'
-      assert.equal upload.opts.awsBucketPath, ''
-      assert.equal upload.opts.awsBucketAcl, 'privat'
-      assert.equal upload.opts.awsMaxRetries, 3
-      assert.equal upload.opts.awsHttpTimeout, 10000
+      assert.equal upload.opts.aws.region, 'us-east-1'
+      assert.equal upload.opts.aws.path, ''
+      assert.equal upload.opts.aws.acl, 'privat'
+      assert.equal upload.opts.aws.maxRetries, 3
+      assert.equal upload.opts.aws.httpOptions.timeout, 10000
 
       assert upload.opts.versions instanceof Array
       assert.equal upload.opts.resizeQuality, 70
@@ -83,6 +84,24 @@ describe 'Upload', ->
 
       assert.equal upload.opts.workers, 1
       assert.equal upload.opts.url, 'https://s3-us-east-1.amazonaws.com/myBucket/'
+
+    it 'should set deprecated options correctly', ->
+      upload = new Upload 'myBucket',
+        awsBucketRegion: 'my-region'
+        awsBucketPath: '/some/path'
+        awsBucketAcl: 'some-acl'
+        awsMaxRetries: 24
+        awsHttpTimeout: 1337
+        awsAccessKeyId: 'public'
+        awsSecretAccessKey: 'secret'
+
+      assert.equal upload.opts.aws.region, 'my-region'
+      assert.equal upload.opts.aws.path, '/some/path'
+      assert.equal upload.opts.aws.acl, 'some-acl'
+      assert.equal upload.opts.aws.maxRetries, 24
+      assert.equal upload.opts.aws.httpOptions.timeout, 1337
+      assert.equal upload.opts.aws.accessKeyId, 'public'
+      assert.equal upload.opts.aws.secretAccessKey, 'secret'
 
     it 'should set custom url', ->
       upload = new Upload 'myBucket', url: 'http://cdn.app.com/'
@@ -102,9 +121,9 @@ describe 'Upload', ->
     it 'should connect to AWS S3 using constructor options', (done) ->
       @timeout 10000
 
-      upload = new Upload process.env.AWS_BUCKET_NAME,
-        awsAccessKeyId: process.env.AWS_ACCESS_KEY_ID
-        awsSecretAccessKey: process.env.AWS_SECRET_ACCESS_KEY
+      upload = new Upload process.env.AWS_BUCKET_NAME, aws:
+        accessKeyId: process.env.AWS_ACCESS_KEY_ID
+        secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY
 
       upload.s3.headBucket Bucket: process.env.AWS_BUCKET_NAME, (err, data) ->
         assert.ifError err
