@@ -37,22 +37,27 @@ var Upload = require('s3-uploader');
 
 * **string** `awsBucketName` - name of Amazon S3 bucket
 * **object** `opts` - global upload options
-  * **string** `awsAccessKeyId` - your AWS access key ID
-  * **string** `awsSecretAccessKey` - your AWS secret access key
-  * **string** `awsBuckeRegion` - region for you bucket; default "us-east-1"
-  * **string** `awsBucketPath` - path within your bucket (ex. "/images")
-  * **string** `awsBucketAcl` - default ACL for uploded images
-  * **number** `awsMaxRetries` - max number of retries; default 3
-  * **number** `awsHttpTimeout` - inactive time (ms) beofre timing out; default 10000
-  * **number** `resizeQuality` - default resize quallity
-  * **boolean** `returnExif` - return exif data for original image
-  * **string** `tmpDir` - directory to store temporary files
-  * **number** `workers` - limit number of async workers
-  * **string** `url` - custom url for uploaded images (ex. "http://cdn.app.com/")
+  * **number** `resizeQuality` - thumbnail resize quallity (**default** `70`)
+  * **boolean** `returnExif` - return exif data for original image (**default** `false`)
+  * **string** `tmpDir` - directory to store temporary files (**default** `os.tmpdir()`)
+  * **number** `workers` - number of async workers (**default** `1`)
+  * **string** `url` - custom public url (**default** build from `region` and `awsBucketName`)
+
+  * **object** `aws` - AWS SDK configuration optsion
+    * **string** `region` - region for you bucket (**default** `us-east-1`)
+    * **string** `path` - path within your bucket (**default** `""`)
+    * **string** `acl` - default ACL for uploded images (**default** `privat`)
+    * **string** `accessKeyId` - AWS access key ID override
+    * **string** `secretAccessKey` - AWS secret access key override
+
+> The `aws` object is passed directly to `aws-sdk`. You can add any of [these
+> options](http://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/S3.html#constructor_details)
+> in order to fine tune the connection – if you know what you are doing.
+
   * **object[]** `versions` - versions to upload to S3
-    * **boolean** `original` - if this is the original image
-    * **string** `suffix` - this is appended to the file name
-    * **number** `quality` - resized image quality
+    * **boolean** `original` - if this is the original image (**default** `false`)
+    * **string** `suffix` - this is appended to the file name (**default** `""`)
+    * **number** `quality` - resized image quality (**default** `resizeQuality`)
     * **number** `maxWidth` - max width for resized image
     * **number** `maxHeight` - max height for resized image
 

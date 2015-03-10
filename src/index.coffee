@@ -6,14 +6,34 @@ mapLimit = require('async').mapLimit
 hash = require('crypto').createHash
 rand = require('crypto').pseudoRandomBytes
 
-Upload = module.exports = (awsBucketName, @opts = {}) ->
-  throw new Error 'Bucket name can not be undefined' if not awsBucketName
+deprecate = require('depd') 's3-uploader'
 
-  @opts.awsBucketRegion ?= 'us-east-1'
-  @opts.awsBucketPath   ?= ''
-  @opts.awsBucketAcl    ?= 'privat'
-  @opts.awsMaxRetries   ?= 3
-  @opts.awsHttpTimeout  ?= 10000
+Upload = module.exports = (awsBucketName, @opts = {}) ->
+  throw new TypeError 'Bucket name can not be undefined' if not awsBucketName
+
+  deprecate '`awsBucketRegion` is deprecated, use `aws.region` instead' if @opts.awsBucketRegion
+  deprecate '`awsBucketPath` is deprecated, use `aws.path` instead' if @opts.awsBucketPath
+  deprecate '`awsBucketAcl` is deprecated, use `aws.acl` instead' if @opts.awsBucketAcl
+  deprecate '`awsMaxRetries` is deprecated, use `aws.maxRetries` instead' if @opts.awsMaxRetries
+  deprecate '`awsHttpTimeout` is deprecated, use `aws.httpOptions.timeout` instead' if @opts.awsHttpTimeout
+  deprecate '`awsAccessKeyId` is deprecated, use `aws.accessKeyId` instead' if @opts.awsAccessKeyId
+  deprecate '`awsSecretAccessKey` is deprecated, use `aws.secretAccessKey` instead' if @opts.awsSecretAccessKey
+
+  @opts.aws         ?= {}
+  @opts.aws.region  ?= @opts.awsBucketRegion  or 'us-east-1'
+  @opts.aws.path    ?= @opts.awsBucketPath    or ''
+  @opts.aws.acl     ?= @opts.awsBucketAcl     or 'privat'
+
+  @opts.aws.sslEnabled      ?= true
+  @opts.aws.maxRetries      ?= @opts.awsMaxRetries or 3
+  @opts.aws.accessKeyId     ?= @opts.awsAccessKeyId
+  @opts.aws.secretAccessKey ?= @opts.awsSecretAccessKey
+
+  @opts.aws.params          ?= {}
+  @opts.aws.params.Bucket   = awsBucketName
+
+  @opts.aws.httpOptions         ?= {}
+  @opts.aws.httpOptions.timeout ?= @opts.awsHttpTimeout or 10000
 
   @opts.versions        ?= []
   @opts.resizeQuality   ?= 70
@@ -23,17 +43,9 @@ Upload = module.exports = (awsBucketName, @opts = {}) ->
   @opts.tmpPrefix       ?= 'gm-'
 
   @opts.workers         ?= 1
-  @opts.url ?= "https://s3-#{@opts.awsBucketRegion}.amazonaws.com/#{awsBucketName}/"
+  @opts.url ?= "https://s3-#{@opts.aws.region}.amazonaws.com/#{@opts.aws.params.Bucket}/"
 
-  @s3 = new S3
-    accessKeyId: @opts.awsAccessKeyId
-    secretAccessKey: @opts.awsSecretAccessKey
-
-    region: @opts.awsBucketRegion
-    maxRetries: @opts.awsMaxRetries
-    sslEnabled: true
-    httpOptions: timeout: @opts.awsHttpTimeout
-    params: Bucket: awsBucketName
+  @s3 = new S3 @opts.aws
 
   @
 
@@ -46,7 +58,7 @@ Upload.prototype._getRandomPath = ->
     y = input[Math.floor((Math.random() * input.length))]
     res.push x + y
 
-  return @opts.awsBucketPath + res.join '/'
+  return @opts.aws.path + res.join '/'
 
 Upload.prototype._uploadPathIsAvailable = (path, callback) ->
   @s3.listObjects Prefix: path, (err, data) ->
@@ -138,7 +150,7 @@ Image.prototype.resize = (version, cb) ->
 Image.prototype.upload = (version, cb) ->
   options =
     Key: @dest + version.suffix + '.' + version.format
-    ACL: version.awsImageAcl or @config.opts.awsBucketAcl
+    ACL: version.awsImageAcl or @config.opts.aws.acl
     Body: fs.createReadStream(version.src)
     ContentType: 'image/' + version.format
     Metadata: @opts.metadata or {}
