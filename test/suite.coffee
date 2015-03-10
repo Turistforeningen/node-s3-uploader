@@ -10,8 +10,8 @@ rand = require('crypto').pseudoRandomBytes
 upload = listObjects = putObject = null
 cleanup = []
 
-SIZE = if process.env.DRONE then 'KBB' else 'KB'
-COLOR = if process.env.DRONE then 'RGB' else 'sRGB'
+SIZE = if process.env.DRONE or process.env.CI then 'KBB' else 'KB'
+COLOR = if process.env.DRONE or process.env.CI then 'RGB' else 'sRGB'
 
 beforeEach ->
   upload = new Upload process.env.AWS_BUCKET_NAME,
