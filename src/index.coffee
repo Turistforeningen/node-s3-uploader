@@ -150,7 +150,7 @@ Image.prototype.resize = (version, cb) ->
 Image.prototype.upload = (version, cb) ->
   options =
     Key: @dest + version.suffix + '.' + version.format
-    ACL: version.awsImageAcl or @config.opts.awsBucketAcl
+    ACL: version.awsImageAcl or @config.opts.aws.acl
     Body: fs.createReadStream(version.src)
     ContentType: 'image/' + version.format
     Metadata: @opts.metadata or {}
