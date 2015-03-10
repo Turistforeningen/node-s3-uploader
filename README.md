@@ -1,7 +1,7 @@
 AWS S3 Image Uploader
 =====================
 
-[![Build Status](https://drone.io/github.com/Turistforeningen/node-s3-uploader/status.png)](https://drone.io/github.com/Turistforeningen/node-s3-uploader/latest)
+[![Build Status](https://app.wercker.com/status/50fbdf51cf64b01a738379a028b8a885/s "Build Status")](https://app.wercker.com/project/bykey/50fbdf51cf64b01a738379a028b8a885)
 [![npm](https://img.shields.io/npm/dm/s3-uploader.svg)]()
 [![npm](https://img.shields.io/npm/v/s3-uploader.svg)]()
 [![node](https://img.shields.io/node/v/s3-uploader.svg)]()
