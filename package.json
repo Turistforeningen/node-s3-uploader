@@ -42,7 +42,7 @@
   "dependencies": {
     "async": "~0.9",
     "aws-sdk": "~2.1",
-    "depd": "^1.0.0",
+    "depd": "~1.0",
     "gm": "~1.17"
   },
   "engines": {
