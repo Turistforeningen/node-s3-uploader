@@ -2,10 +2,10 @@ AWS S3 Image Uploader
 =====================
 
 [![Build status](https://img.shields.io/wercker/ci/54f18246d9b14636634ff908.svg "Build status")](https://app.wercker.com/project/bykey/50fbdf51cf64b01a738379a028b8a885)
-[![NPM downloads](https://img.shields.io/npm/dm/s3-uploader.svg "NPM downloads")]()
-[![NPM version](https://img.shields.io/npm/v/s3-uploader.svg "NPM version")]()
-[![Node version](https://img.shields.io/node/v/s3-uploader.svg "Node version")]()
-[![Dependency status](https://img.shields.io/david/turistforeningen/node-s3-uploader.svg "Dependency status")]()
+[![NPM downloads](https://img.shields.io/npm/dm/s3-uploader.svg "NPM downloads")](https://www.npmjs.com/package/s3-uploader)
+[![NPM version](https://img.shields.io/npm/v/s3-uploader.svg "NPM version")](https://www.npmjs.com/package/s3-uploader)
+[![Node version](https://img.shields.io/node/v/s3-uploader.svg "Node version")](https://www.npmjs.com/package/s3-uploader)
+[![Dependency status](https://img.shields.io/david/turistforeningen/node-s3-uploader.svg "Dependency status")](https://david-dm.org/turistforeningen/node-s3-uploader)
 
 Flexible and efficient resize, rename, and upload images to Amazon S3 disk
 storage. Uses the official [AWS Node SDK](http://aws.amazon.com/sdkfornodejs/)
