@@ -163,6 +163,21 @@ describe 'Upload', ->
         assert /^some\/path\/[A-Za-z0-9]{2}\/[A-Za-z0-9]{2}\/[A-Za-z0-9]{2}$/.test(path)
         done()
 
+  describe '#upload()', ->
+    it 'should use default aws path', (done) ->
+      upload._uploadGeneratePath = (prefix, cb) ->
+        assert.equal prefix, upload.opts.aws.path
+        done()
+
+      upload.upload 'dummy.jpg', {}
+
+    it 'should override default aws path', (done) ->
+      upload._uploadGeneratePath = (prefix, cb) ->
+        assert.equal prefix, '/my/new/path'
+        done()
+
+      upload.upload 'dummy.jpg', awsPath: '/my/new/path'
+
 describe 'Image', ->
   image = null
 

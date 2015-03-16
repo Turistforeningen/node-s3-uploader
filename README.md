@@ -91,7 +91,10 @@ var client = new Upload('my_s3_bucket', {
 ### #upload(**string** `src`, **object** `opts`, **function** `cb`)
 
 * **string** `src` - absolute path to source image to upload
-* **object** `opts` - local upload config options (overwrites global config)
+
+* **object** `opts` - upload config options
+  * **string** `awsPath` - local override for `opts.aws.path`
+
 * **function** `cb` - callback function (**Error** `err`, **object[]** `versions`, **object** `meta`)
   * **Error** `err` - `null` if everything went fine
   * **object[]** `versions` - original and resized images with path/location

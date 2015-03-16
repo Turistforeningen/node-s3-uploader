@@ -72,7 +72,9 @@ Upload.prototype._uploadGeneratePath = (prefix, callback) ->
     return callback null, path
 
 Upload.prototype.upload = (src, opts, cb) ->
-  @_uploadGeneratePath (err, dest) =>
+  prefix = opts?.awsPath or @opts.aws.path
+
+  @_uploadGeneratePath prefix, (err, dest) =>
     return cb err if err
     new Image(src, dest, opts, @).exec cb
 
