@@ -114,7 +114,10 @@ Image.prototype.makeMpc = (cb) ->
     return cb null
 
 Image.prototype.resize = (version, cb) ->
-  if version.original
+  if typeof version.original isnt 'undefined'
+    if version.original is false
+      throw new Error "version.original can not be false"
+
     version.src = @src
     version.format = @meta.format
     version.size = @meta.fileSize

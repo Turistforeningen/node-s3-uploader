@@ -263,6 +263,11 @@ describe 'Image', ->
           height: image.meta.imageSize.height
         done()
 
+    it 'should throw error when version original is false', ->
+      assert.throws ->
+        image.resize original: false
+      , '/version.original can not be false/'
+
     it 'should return updated properties for resized image', (done) ->
       @timeout 10000
       image.resize JSON.parse(JSON.stringify(versions[1])), (err, version) ->
