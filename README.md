@@ -55,7 +55,7 @@ var Upload = require('s3-uploader');
 > in order to fine tune the connection – if you know what you are doing.
 
   * **object[]** `versions` - versions to upload to S3
-    * **boolean** `original` - if this is the original image (**default** `false`)
+    * **boolean** `original` - set this to `true` to save the original image
     * **string** `suffix` - this is appended to the file name (**default** `""`)
     * **number** `quality` - resized image quality (**default** `resizeQuality`)
     * **number** `maxWidth` - max width for resized image
