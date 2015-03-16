@@ -132,7 +132,7 @@ describe 'Upload', ->
   describe '#_getRandomPath()', ->
     it 'should return a new random path', ->
       path = upload._getRandomPath()
-      assert(/^images_test\/[A-Za-z0-9]{2}\/[A-Za-z0-9]{2}\/[A-Za-z0-9]{2}$/.test(path))
+      assert(/^[A-Za-z0-9]{2}\/[A-Za-z0-9]{2}\/[A-Za-z0-9]{2}$/.test(path))
 
   describe '#_uploadPathIsAvailable()', ->
     it 'should return true for avaiable path', (done) ->
@@ -152,15 +152,15 @@ describe 'Upload', ->
   describe '#_uploadGeneratePath()', ->
     it 'should return an error if path is taken', (done) ->
       upload._uploadPathIsAvailable = (path, cb) -> process.nextTick -> cb null, path, false
-      upload._uploadGeneratePath (err, path) ->
+      upload._uploadGeneratePath 'some/path/', (err, path) ->
         assert /Path '[^']+' not avaiable!/.test err
         done()
 
     it 'should return an avaiable path', (done) ->
       upload._uploadPathIsAvailable = (path, cb) -> process.nextTick -> cb null, path, true
-      upload._uploadGeneratePath (err, path) ->
+      upload._uploadGeneratePath 'some/path/', (err, path) ->
         assert.ifError err
-        assert /^images_test\/[A-Za-z0-9]{2}\/[A-Za-z0-9]{2}\/[A-Za-z0-9]{2}$/.test(path)
+        assert /^some\/path\/[A-Za-z0-9]{2}\/[A-Za-z0-9]{2}\/[A-Za-z0-9]{2}$/.test(path)
         done()
 
 describe 'Image', ->

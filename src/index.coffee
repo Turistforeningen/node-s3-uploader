@@ -58,15 +58,15 @@ Upload.prototype._getRandomPath = ->
     y = input[Math.floor((Math.random() * input.length))]
     res.push x + y
 
-  return @opts.aws.path + res.join '/'
+  return res.join '/'
 
 Upload.prototype._uploadPathIsAvailable = (path, callback) ->
   @s3.listObjects Prefix: path, (err, data) ->
     return callback err if err
     return callback null, path, data.Contents.length is 0
 
-Upload.prototype._uploadGeneratePath = (callback) ->
-  @._uploadPathIsAvailable this._getRandomPath(), (err, path, avaiable) ->
+Upload.prototype._uploadGeneratePath = (prefix, callback) ->
+  @._uploadPathIsAvailable prefix + @._getRandomPath(), (err, path, avaiable) ->
     return callback err if err
     return callback new Error "Path '#{path}' not avaiable!" if not avaiable
     return callback null, path
