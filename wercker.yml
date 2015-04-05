@@ -18,3 +18,7 @@ build:
     - wantedly/pretty-slack-notify:
         webhook_url: $SLACK_WEBHOOK_URL
 
+deploy:
+  steps:
+    - kwakayama/npm-publish
+
