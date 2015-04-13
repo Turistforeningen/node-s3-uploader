@@ -11,7 +11,7 @@ Flexible and efficient resize, rename, and upload images to Amazon S3 disk
 storage. Uses the official [AWS Node SDK](http://aws.amazon.com/sdkfornodejs/)
 and [GM](https://github.com/aheckmann/gm) for image processing.
 
-[![Join the chat at https://gitter.im/Turistforeningen/node-s3-uploader](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/Turistforeningen/node-s3-uploader?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![Join the chat at https://gitter.im/Turistforeningen/node-s3-uploader](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/Turistforeningen/node-s3-uploader)
 
 ## Install
 
