@@ -187,4 +187,3 @@ Image.prototype.exec = (cb) ->
       mapLimit versions, @config.opts.workers, @resizeAndUpload.bind(@), (err, versions) =>
         return cb err if err
         return cb null, versions, @meta
-
