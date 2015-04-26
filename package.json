@@ -43,7 +43,8 @@
     "async": "~1.2",
     "aws-sdk": "~2.1",
     "depd": "~1.0",
-    "gm": "~1.18"
+    "im-resize": "~1.0",
+    "im-metadata": "~1.1"
   },
   "engines": {
     "node": ">=0.10 <0.12"
