@@ -40,10 +40,10 @@
     "mocha": "~2.2.1"
   },
   "dependencies": {
-    "async": "~0.9",
+    "async": "~1.2",
     "aws-sdk": "~2.1",
     "depd": "~1.0",
-    "gm": "~1.17"
+    "gm": "~1.18"
   },
   "engines": {
     "node": ">=0.10 <0.12"
