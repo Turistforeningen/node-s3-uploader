@@ -60,6 +60,11 @@ var Upload = require('s3-uploader');
     * **number** `quality` - resized image quality (**default** `resizeQuality`)
     * **number** `maxWidth` - max width for resized image
     * **number** `maxHeight` - max height for resized image
+    * **object** `crop` - crop using a rectangle on the original size image
+      * **number** `x` - x position of top left corner of the cropping rectangle (**default** `0`)
+      * **number** `y` - y position top left corner of the cropping rectangle (**default** `0`)
+      * **number** `width` - width of the cropping rectangle (**default** `50`)
+      * **number** `height` - height of the cropping rectangle (**default** `50`)
 
 #### Example
 
@@ -84,6 +89,16 @@ var client = new Upload('my_s3_bucket', {
     suffix: '-small',
     maxHeight: 320,
     maxWidth: 320
+  },{
+    suffix: '-thumb',
+    maxWidth: 64,
+    maxHeight: 64,
+    crop: {
+      x: 20,
+      y: 35,
+      width: 100,
+      height: 100
+    }
   }]
 });
 ```
