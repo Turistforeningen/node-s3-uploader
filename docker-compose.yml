@@ -1,0 +1,9 @@
+dev:
+  image: starefossen/iojs-imagemagick:1-6
+  working_dir: /usr/src/app
+  volumes:
+    - ".:/usr/src/app"
+  command: "npm run watch"
+  env_file: .env
+  environment:
+    NODE_ENV: development
