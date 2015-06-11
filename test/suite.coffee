@@ -79,7 +79,7 @@ describe 'Upload', ->
       assert.equal upload.opts.resizeQuality, 70
       assert.equal upload.opts.returnExif, false
 
-      assert.equal upload.opts.tmpDir, '/tmp/'
+      assert.equal upload.opts.tmpDir, require('os').tmpdir() + '/'
       assert.equal upload.opts.tmpPrefix, 'gm-'
 
       assert.equal upload.opts.workers, 1
@@ -291,7 +291,7 @@ describe 'Image', ->
           suffix: versions[1].suffix
           quality: versions[1].quality
           format: 'jpeg'
-          src: '/tmp/gm-ed8d8b72071e731dc9065095c92c3e384d7c1e27-large.jpeg'
+          src: require('os').tmpdir() + '/gm-ed8d8b72071e731dc9065095c92c3e384d7c1e27-large.jpeg'
           width: versions[1].maxWidth
           height: versions[1].maxHeight
 
