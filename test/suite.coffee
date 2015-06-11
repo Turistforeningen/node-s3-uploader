@@ -281,7 +281,7 @@ describe 'Image', ->
           colorspace: 'RGB'
           height: 2048
           width: 1536
-          orientation: 'Undefined'
+          orientation: ''
 
         done()
 
