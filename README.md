@@ -15,6 +15,11 @@ processing.
 
 [![Join the chat at https://gitter.im/Turistforeningen/node-s3-uploader](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/Turistforeningen/node-s3-uploader)
 
+## Changelog
+
+All changes are documentated on the [releases page](https://github.com/Turistforeningen/node-s3-uploader/releases).
+Changes for latest release can be [found here](https://github.com/Turistforeningen/node-s3-uploader/releases/latest).
+
 ## Install
 
 ```
