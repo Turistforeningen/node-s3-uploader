@@ -88,7 +88,7 @@ describe 'Upload', ->
         returnExif: false
         resize: quality: 70
         versions: []
-        url: 'https://s3-us-east-1.amazonaws.com/myBucket/'
+        url: 'https://s3.amazonaws.com/myBucket/'
 
     it 'sets deprecated options correctly', ->
       upload = new Upload 'myBucket',
