@@ -176,13 +176,11 @@ describe 'Image', ->
   image = null
 
   beforeEach ->
-    upload._getRandomPath = -> return 'aa/bb/cc'
-
-  beforeEach ->
     src = __dirname + '/assets/photo.jpg'
     opts = {}
 
     image = new Upload.Image src, opts, upload
+    image.upload._getRandomPath = -> return 'aa/bb/cc'
 
   describe 'constructor', ->
     it 'sets default values', ->
