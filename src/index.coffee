@@ -11,30 +11,20 @@ retry     = require('async').retry
 resize    = require 'im-resize'
 metadata  = require 'im-metadata'
 
-deprecate = require('depd') 's3-uploader'
-
 Upload = module.exports = (awsBucketName, @opts = {}) ->
   throw new TypeError 'Bucket name can not be undefined' if not awsBucketName
 
-  deprecate '`awsBucketRegion` is deprecated, use `aws.region` instead' if @opts.awsBucketRegion
-  deprecate '`awsBucketPath` is deprecated, use `aws.path` instead' if @opts.awsBucketPath
-  deprecate '`awsBucketAcl` is deprecated, use `aws.acl` instead' if @opts.awsBucketAcl
-  deprecate '`awsMaxRetries` is deprecated, use `aws.maxRetries` instead' if @opts.awsMaxRetries
-  deprecate '`awsHttpTimeout` is deprecated, use `aws.httpOptions.timeout` instead' if @opts.awsHttpTimeout
-  deprecate '`awsAccessKeyId` is deprecated, use `aws.accessKeyId` instead' if @opts.awsAccessKeyId
-  deprecate '`awsSecretAccessKey` is deprecated, use `aws.secretAccessKey` instead' if @opts.awsSecretAccessKey
-
   @opts.aws                     ?= {}
-  @opts.aws.accessKeyId         ?= @opts.awsAccessKeyId
-  @opts.aws.acl                 ?= @opts.awsBucketAcl     or 'privat'
+  #@opts.aws.accessKeyId
+  @opts.aws.acl                 ?= 'privat'
   @opts.aws.httpOptions         ?= {}
-  @opts.aws.httpOptions.timeout ?= @opts.awsHttpTimeout or 10000
-  @opts.aws.maxRetries          ?= @opts.awsMaxRetries or 3
+  @opts.aws.httpOptions.timeout ?= 10000
+  @opts.aws.maxRetries          ?= 3
   @opts.aws.params              ?= {}
   @opts.aws.params.Bucket       = awsBucketName
-  @opts.aws.path                ?= @opts.awsBucketPath    or ''
-  @opts.aws.region              ?= @opts.awsBucketRegion  or 'us-east-1'
-  @opts.aws.secretAccessKey     ?= @opts.awsSecretAccessKey
+  @opts.aws.path                ?= ''
+  @opts.aws.region              ?= 'us-east-1'
+  #@opts.aws.secretAccessKey
   @opts.aws.sslEnabled          ?= true
 
   @opts.cleanup                 ?= {}
