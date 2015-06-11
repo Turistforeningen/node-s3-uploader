@@ -75,38 +75,18 @@ describe 'Upload', ->
       assert upload.s3 instanceof require('aws-sdk').S3
       assert.deepEqual upload.opts,
         aws:
-          accessKeyId: undefined,
           acl: 'privat'
           httpOptions: timeout: 10000
           maxRetries: 3
           params: Bucket: 'myBucket'
           path: ''
           region: 'us-east-1'
-          secretAccessKey: undefined
           sslEnabled: true
         cleanup: {}
         returnExif: false
         resize: quality: 70
         versions: []
         url: 'https://s3.amazonaws.com/myBucket/'
-
-    it 'sets deprecated options correctly', ->
-      upload = new Upload 'myBucket',
-        awsBucketRegion: 'my-region'
-        awsBucketPath: '/some/path'
-        awsBucketAcl: 'some-acl'
-        awsMaxRetries: 24
-        awsHttpTimeout: 1337
-        awsAccessKeyId: 'public'
-        awsSecretAccessKey: 'secret'
-
-      assert.equal upload.opts.aws.region, 'my-region'
-      assert.equal upload.opts.aws.path, '/some/path'
-      assert.equal upload.opts.aws.acl, 'some-acl'
-      assert.equal upload.opts.aws.maxRetries, 24
-      assert.equal upload.opts.aws.httpOptions.timeout, 1337
-      assert.equal upload.opts.aws.accessKeyId, 'public'
-      assert.equal upload.opts.aws.secretAccessKey, 'secret'
 
     it 'sets default url based on AWS region', ->
       upload = new Upload 'myBucket', aws: region: 'my-region-1'

@@ -42,7 +42,6 @@
   "dependencies": {
     "async": "~1.2",
     "aws-sdk": "~2.1",
-    "depd": "~1.0",
     "im-resize": "~2.0",
     "im-metadata": "~2.1"
   },
