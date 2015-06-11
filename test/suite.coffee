@@ -83,7 +83,7 @@ describe 'Upload', ->
       assert.equal upload.opts.tmpPrefix, 'gm-'
 
       assert.equal upload.opts.workers, 1
-      assert.equal upload.opts.url, 'https://s3-us-east-1.amazonaws.com/myBucket/'
+      assert.equal upload.opts.url, 'https://s3.amazonaws.com/myBucket/'
 
     it 'should set deprecated options correctly', ->
       upload = new Upload 'myBucket',

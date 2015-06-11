@@ -43,7 +43,11 @@ Upload = module.exports = (awsBucketName, @opts = {}) ->
   @opts.tmpPrefix       ?= 'gm-'
 
   @opts.workers         ?= 1
-  @opts.url ?= "https://s3-#{@opts.aws.region}.amazonaws.com/#{@opts.aws.params.Bucket}/"
+
+  if not @opts.url and @opts.aws.region is 'us-east-1'
+    @opts.url ?= "https://s3.amazonaws.com/#{@opts.aws.params.Bucket}/"
+  else if not @opts.url
+    @opts.url ?= "https://s3-#{@opts.aws.region}.amazonaws.com/#{@opts.aws.params.Bucket}/"
 
   @s3 = new S3 @opts.aws
 
