@@ -1,10 +1,15 @@
-S3 = require('aws-sdk').S3
-fs = require 'fs'
-gm = require('gm').subClass imageMagick: true
-mapLimit = require('async').mapLimit
+fs        = require('fs')
+extname   = require('path').extname
 
-hash = require('crypto').createHash
-rand = require('crypto').pseudoRandomBytes
+S3        = require('aws-sdk').S3
+
+auto      = require('async').auto
+each      = require('async').each
+map       = require('async').map
+retry     = require('async').retry
+
+resize    = require 'im-resize'
+metadata  = require 'im-metadata'
 
 deprecate = require('depd') 's3-uploader'
 
@@ -19,36 +24,37 @@ Upload = module.exports = (awsBucketName, @opts = {}) ->
   deprecate '`awsAccessKeyId` is deprecated, use `aws.accessKeyId` instead' if @opts.awsAccessKeyId
   deprecate '`awsSecretAccessKey` is deprecated, use `aws.secretAccessKey` instead' if @opts.awsSecretAccessKey
 
-  @opts.aws         ?= {}
-  @opts.aws.region  ?= @opts.awsBucketRegion  or 'us-east-1'
-  @opts.aws.path    ?= @opts.awsBucketPath    or ''
-  @opts.aws.acl     ?= @opts.awsBucketAcl     or 'privat'
-
-  @opts.aws.sslEnabled      ?= true
-  @opts.aws.maxRetries      ?= @opts.awsMaxRetries or 3
-  @opts.aws.accessKeyId     ?= @opts.awsAccessKeyId
-  @opts.aws.secretAccessKey ?= @opts.awsSecretAccessKey
-
-  @opts.aws.params          ?= {}
-  @opts.aws.params.Bucket   = awsBucketName
-
+  @opts.aws                     ?= {}
+  @opts.aws.accessKeyId         ?= @opts.awsAccessKeyId
+  @opts.aws.acl                 ?= @opts.awsBucketAcl     or 'privat'
   @opts.aws.httpOptions         ?= {}
   @opts.aws.httpOptions.timeout ?= @opts.awsHttpTimeout or 10000
+  @opts.aws.maxRetries          ?= @opts.awsMaxRetries or 3
+  @opts.aws.params              ?= {}
+  @opts.aws.params.Bucket       = awsBucketName
+  @opts.aws.path                ?= @opts.awsBucketPath    or ''
+  @opts.aws.region              ?= @opts.awsBucketRegion  or 'us-east-1'
+  @opts.aws.secretAccessKey     ?= @opts.awsSecretAccessKey
+  @opts.aws.sslEnabled          ?= true
 
-  @opts.versions        ?= []
-  @opts.resizeQuality   ?= 70
-  @opts.returnExif      ?= false
+  @opts.cleanup                 ?= {}
+  @opts.returnExif              ?= false
 
-  @opts.tmpDir          ?= require('os').tmpdir() + '/'
-  @opts.tmpPrefix       ?= 'gm-'
+  @opts.resize                  ?= {}
+  #@opts.resize.path
+  #@opts.resize.prefix
+  @opts.resize.quality          ?= 70
+  @opts.versions                ?= []
 
-  @opts.workers         ?= 1
   @opts.url ?= "https://s3-#{@opts.aws.region}.amazonaws.com/#{@opts.aws.params.Bucket}/"
 
   @s3 = new S3 @opts.aws
 
   @
 
+##
+# Generate a random path on the form /xx/yy/zz
+##
 Upload.prototype._getRandomPath = ->
   input = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
   res = []
@@ -60,130 +66,107 @@ Upload.prototype._getRandomPath = ->
 
   return res.join '/'
 
-Upload.prototype._uploadPathIsAvailable = (path, callback) ->
-  @s3.listObjects Prefix: path, (err, data) ->
-    return callback err if err
-    return callback null, path, data.Contents.length is 0
+##
+# Generate a random avaiable path on the S3 bucket
+##
+Upload.prototype._getDestPath = (prefix, callback) ->
+  retry 5, (cb) =>
+    path = prefix + @_getRandomPath()
+    @s3.listObjects Prefix: path, (err, data) ->
+      return cb err if err
+      return cb null, path if data.Contents.length is 0
+      return cb new Error "Path #{path} not avaiable"
+  , callback
 
-Upload.prototype._uploadGeneratePath = (prefix, callback) ->
-  @._uploadPathIsAvailable prefix + @._getRandomPath(), (err, path, avaiable) ->
-    return callback err if err
-    return callback new Error "Path '#{path}' not avaiable!" if not avaiable
-    return callback null, path
-
+##
+# Upload a new image to the S3 bucket
+##
 Upload.prototype.upload = (src, opts, cb) ->
-  prefix = opts?.awsPath or @opts.aws.path
+  image = new Image src, opts, @
+  image.start(cb)
 
-  @_uploadGeneratePath prefix, (err, dest) =>
-    return cb err if err
-    new Image(src, dest, opts, @).exec cb
-
-Image = Upload.Image = (src, dest, opts, config) ->
-  @config = config
-
-  @src  = src
-  @dest = dest
-  @tmpName = hash('sha1').update(rand(128)).digest('hex')
-
-  @opts = opts or {}
-
-  @meta = {}
-  @gm = gm @src
-
+##
+# Image upload
+##
+Image = module.exports.Image = (@src, @opts, @upload) ->
   @
 
-Image.prototype.getMeta = (cb) ->
-  @gm.identify (err, val) =>
-    return cb err if err
-    @meta =
-      format: val.format.toLowerCase()
-      fileSize: val.Filesize
-      imageSize: val.size
-      orientation: val.Orientation
-      colorSpace: val.Colorspace
-      compression: val.Compression
-      quallity: val.Quality
-      exif: val.Properties if @config.opts.returnExif
+Image.prototype.start = (cb) ->
+  auto
+    metadata: @getMetadata.bind(@, @src)
+    dest: @getDest.bind(@)
+    versions: ['metadata', @resizeVersions.bind(@)]
+    uploads: ['versions', 'dest', @uploadVersions.bind(@)]
+    cleanup: ['uploads', @removeVersions.bind(@)]
+  , (err, results) ->
+    cb err, results.uploads, results.metadata
 
-    return cb null, @meta
+##
+# Get image metadata
+##
+Image.prototype.getMetadata = (src, cb) ->
+  metadata src, exif: @upload.opts.returnExif, cb
 
-Image.prototype.makeMpc = (cb) ->
-  @gm.write @src + '.mpc', (err) ->
-    return cb err if err
+##
+# Get image destination
+##
+Image.prototype.getDest = (cb) ->
+  prefix = @opts?.awsPath or @upload.opts.aws.path
+  @upload._getDestPath prefix, cb
 
-    @gm = gm @src + '.mpc'
+##
+# Resize image
+##
+Image.prototype.resizeVersions = (cb, results) ->
+  resize results.metadata,
+    path: @upload.opts.resize.path
+    prefix: @upload.opts.resize.prefix
+    quality: @upload.opts.resize.quality
+    versions: JSON.parse JSON.stringify @upload.opts.versions
+  , cb
 
-    return cb null
+##
+# Upload resized versions
+##
+Image.prototype.uploadVersions = (cb, results) ->
+  if @upload.opts.original
+    results.versions.push
+      awsImageAcl: @upload.opts.original.awsImageAcl
+      original: true
+      path: @src
 
-Image.prototype.resize = (version, cb) ->
-  if typeof version.original isnt 'undefined'
-    if version.original is false
-      throw new Error "version.original can not be false"
+  map results.versions, @_upload.bind(@, results.dest), cb
 
-    version.src = @src
-    version.format = @meta.format
-    version.size = @meta.fileSize
-    version.width = @meta.imageSize.width
-    version.height = @meta.imageSize.height
+##
+# Clean up local copies
+##
+Image.prototype.removeVersions = (cb, results) ->
+  each results.uploads, (image, callback) =>
+    if not @upload.opts.cleanup.original and image.original \
+      or not @upload.opts.cleanup.versions and not image.original
+        return setTimeout callback, 0
 
-    return process.nextTick -> cb null, version
+    fs.unlink image.path, callback
+  , (err) ->
+    cb()
 
-  version.format = 'jpeg'
-  version.src = [
-    @config.opts.tmpDir
-    @config.opts.tmpPrefix
-    @tmpName
-    version.suffix
-    ".#{version.format}"
-  ].join('')
+##
+# Upload image version to S3
+##
+Image.prototype._upload = (dest, version, cb) ->
+  format = extname version.path
 
-  img = @gm
-    .resize(version.maxWidth, version.maxHeight)
-    .quality(version.quality or @config.opts.resizeQuality)
-
-  img.autoOrient() if @meta.orientation
-  img.colorspace('RGB') if @meta.colorSpace not in ['RGB', 'sRGB']
-
-  img.write version.src, (err) ->
-      return cb err if err
-
-      version.width = version.maxWidth; delete version.maxWidth
-      version.height = version.maxHeight; delete version.maxHeight
-
-      cb null, version
-
-Image.prototype.upload = (version, cb) ->
   options =
-    Key: @dest + version.suffix + '.' + version.format
-    ACL: version.awsImageAcl or @config.opts.aws.acl
-    Body: fs.createReadStream(version.src)
-    ContentType: 'image/' + version.format
-    Metadata: @opts.metadata or {}
+    Key: dest + (version.suffix || '') + format
+    ACL: version.awsImageAcl or @upload.opts.aws.acl
+    Body: fs.createReadStream version.path
+    ContentType: "image/#{format.substr(1)}"
 
-  @config.s3.putObject options, (err, data) =>
+  @upload.s3.putObject options, (err, data) =>
     return cb err if err
 
-    version.etag = data.ETag.substr(1, data.ETag.length-2)
-    version.path = options.Key
-    version.url = @config.opts.url + version.path if @config.opts.url
-
-    delete version.awsImageAcl
-    delete version.suffix
+    version.etag = data.ETag
+    version.key = options.Key
+    version.url = @upload.opts.url + options.Key if @upload.opts.url
 
     cb null, version
-
-Image.prototype.resizeAndUpload = (version, cb) ->
-  version.suffix = version.suffix or ''
-
-  @resize version, (err, version) =>
-    return cb err if err
-    @upload version, cb
-
-Image.prototype.exec = (cb) ->
-  @getMeta (err) =>
-    @makeMpc (err) =>
-      return cb err if err
-      versions = JSON.parse(JSON.stringify(@config.opts.versions))
-      mapLimit versions, @config.opts.workers, @resizeAndUpload.bind(@), (err, versions) =>
-        return cb err if err
-        return cb null, versions, @meta

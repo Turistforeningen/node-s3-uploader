@@ -1,17 +1,8 @@
 assert = require 'assert'
 Upload = require '../src/index.coffee'
 
-fs = require('fs')
-gm = require('gm').subClass imageMagick: true
-
-hash = require('crypto').createHash
-rand = require('crypto').pseudoRandomBytes
-
 upload = listObjects = putObject = null
 cleanup = []
-
-SIZE = if process.env.DRONE or process.env.CI then 'KBB' else 'KB'
-COLOR = if process.env.DRONE or process.env.CI then 'RGB' else 'sRGB'
 
 beforeEach ->
   upload = new Upload process.env.AWS_BUCKET_NAME,
@@ -19,10 +10,12 @@ beforeEach ->
       path: process.env.AWS_BUCKET_PATH
       region: process.env.AWS_BUCKET_REGION
       acl: 'public-read'
-    versions: [{
-      original: true
+    cleanup:
+      versions: true
+      original: false
+    original:
       awsImageAcl: 'private'
-    },{
+    versions: [{
       maxHeight: 1040
       maxWidth: 1040
       suffix: '-large'
@@ -30,11 +23,23 @@ beforeEach ->
     },{
       maxHeight: 780
       maxWidth: 780
+      aspect: '4:3'
       suffix: '-medium'
     },{
       maxHeight: 320
       maxWidth: 320
+      aspect: '4:3'
       suffix: '-small'
+    },{
+      maxHeight: 100
+      maxWidth: 100
+      aspect: '1:1'
+      suffix: '-thumb1'
+    },{
+      maxHeight: 250
+      maxWidth: 250
+      aspect: '1:1'
+      suffix: '-thumb2'
     }]
 
   # Mock S3 API calls
@@ -43,7 +48,7 @@ beforeEach ->
       process.nextTick -> cb null, Contents: []
 
     upload.s3.putObject = (opts, cb) ->
-      process.nextTick -> cb null, ETag: '"' + hash('md5').update(rand(32)).digest('hex') + '"'
+      process.nextTick -> cb null, ETag: '"f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1"'
 
 # Clean up S3 objects
 if process.env.INTEGRATION_TEST is 'true'
@@ -59,33 +64,33 @@ if process.env.INTEGRATION_TEST is 'true'
 
 describe 'Upload', ->
   describe 'constructor', ->
-    it 'should throw error for missing awsBucketName param', ->
+    it 'throws error for missing awsBucketName param', ->
       assert.throws ->
         new Upload()
       , /Bucket name can not be undefined/
 
-    it 'should set default values if not provided', ->
+    it 'sets default values if not provided', ->
       upload = new Upload 'myBucket'
 
       assert upload.s3 instanceof require('aws-sdk').S3
+      assert.deepEqual upload.opts,
+        aws:
+          accessKeyId: undefined,
+          acl: 'privat'
+          httpOptions: timeout: 10000
+          maxRetries: 3
+          params: Bucket: 'myBucket'
+          path: ''
+          region: 'us-east-1'
+          secretAccessKey: undefined
+          sslEnabled: true
+        cleanup: {}
+        returnExif: false
+        resize: quality: 70
+        versions: []
+        url: 'https://s3-us-east-1.amazonaws.com/myBucket/'
 
-      assert.equal upload.opts.aws.region, 'us-east-1'
-      assert.equal upload.opts.aws.path, ''
-      assert.equal upload.opts.aws.acl, 'privat'
-      assert.equal upload.opts.aws.maxRetries, 3
-      assert.equal upload.opts.aws.httpOptions.timeout, 10000
-
-      assert upload.opts.versions instanceof Array
-      assert.equal upload.opts.resizeQuality, 70
-      assert.equal upload.opts.returnExif, false
-
-      assert.equal upload.opts.tmpDir, '/tmp/'
-      assert.equal upload.opts.tmpPrefix, 'gm-'
-
-      assert.equal upload.opts.workers, 1
-      assert.equal upload.opts.url, 'https://s3-us-east-1.amazonaws.com/myBucket/'
-
-    it 'should set deprecated options correctly', ->
+    it 'sets deprecated options correctly', ->
       upload = new Upload 'myBucket',
         awsBucketRegion: 'my-region'
         awsBucketPath: '/some/path'
@@ -103,316 +108,333 @@ describe 'Upload', ->
       assert.equal upload.opts.aws.accessKeyId, 'public'
       assert.equal upload.opts.aws.secretAccessKey, 'secret'
 
-    it 'should set custom url', ->
+    it 'sets default url based on AWS region', ->
+      upload = new Upload 'myBucket', aws: region: 'my-region-1'
+      assert.equal upload.opts.url, 'https://s3-my-region-1.amazonaws.com/myBucket/'
+
+    it 'sets custom url', ->
       upload = new Upload 'myBucket', url: 'http://cdn.app.com/'
       assert.equal upload.opts.url, 'http://cdn.app.com/'
 
-    it 'should override default values'
-
-    it 'should connect to AWS S3 using environment variables', (done) ->
+    it 'connects to AWS S3 using environment variables', (done) ->
       @timeout 10000
 
       upload = new Upload process.env.AWS_BUCKET_NAME
 
-      upload.s3.headBucket Bucket: process.env.AWS_BUCKET_NAME, (err, data) ->
+      upload.s3.headBucket upload.opts.aws.params, (err, data) ->
         assert.ifError err
         done()
 
-    it 'should connect to AWS S3 using constructor options', (done) ->
+    it 'connects to AWS S3 using constructor options', (done) ->
       @timeout 10000
 
       upload = new Upload process.env.AWS_BUCKET_NAME, aws:
         accessKeyId: process.env.AWS_ACCESS_KEY_ID
         secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY
 
-      upload.s3.headBucket Bucket: process.env.AWS_BUCKET_NAME, (err, data) ->
+      upload.s3.headBucket upload.opts.aws.params, (err, data) ->
         assert.ifError err
         done()
 
   describe '#_getRandomPath()', ->
-    it 'should return a new random path', ->
+    it 'returns a new random path', ->
       path = upload._getRandomPath()
       assert(/^[A-Za-z0-9]{2}\/[A-Za-z0-9]{2}\/[A-Za-z0-9]{2}$/.test(path))
 
-  describe '#_uploadPathIsAvailable()', ->
-    it 'should return true for avaiable path', (done) ->
+  describe '#_getDestPath()', ->
+    beforeEach ->
+      upload._getRandomPath = -> return 'aa/bb/cc'
+
+    it 'returns a random avaiable path', (done) ->
       upload.s3.listObjects = (opts, cb) -> process.nextTick -> cb null, Contents: []
-      upload._uploadPathIsAvailable 'some/path/', (err, path, isAvaiable) ->
+      upload._getDestPath 'some/prefix/', (err, path) ->
         assert.ifError err
-        assert.equal isAvaiable, true
+        assert.equal path, 'some/prefix/aa/bb/cc'
         done()
 
-    it 'should return false for unavaiable path', (done) ->
+    it 'returns error if no available path can be found', (done) ->
       upload.s3.listObjects = (opts, cb) -> process.nextTick -> cb null, Contents: [opts.Prefix]
-      upload._uploadPathIsAvailable 'some/path/', (err, path, isAvaiable) ->
+      upload._getDestPath 'some/prefix/', (err, path) ->
+        assert err instanceof Error
+        assert.equal err.message, 'Path some/prefix/aa/bb/cc not avaiable'
+        done()
+
+    it 'retries five 5 times to find an avaiable path', (done) ->
+      count = 0
+
+      upload.s3.listObjects = (opts, cb) ->
+        if ++count < 5
+          return process.nextTick -> cb null, Contents: [opts.Prefix]
+        process.nextTick -> cb null, Contents: []
+
+      upload._getDestPath 'some/prefix/', (err, path) ->
         assert.ifError err
-        assert.equal isAvaiable, false
+        assert.equal path, 'some/prefix/aa/bb/cc'
         done()
-
-  describe '#_uploadGeneratePath()', ->
-    it 'should return an error if path is taken', (done) ->
-      upload._uploadPathIsAvailable = (path, cb) -> process.nextTick -> cb null, path, false
-      upload._uploadGeneratePath 'some/path/', (err, path) ->
-        assert /Path '[^']+' not avaiable!/.test err
-        done()
-
-    it 'should return an avaiable path', (done) ->
-      upload._uploadPathIsAvailable = (path, cb) -> process.nextTick -> cb null, path, true
-      upload._uploadGeneratePath 'some/path/', (err, path) ->
-        assert.ifError err
-        assert /^some\/path\/[A-Za-z0-9]{2}\/[A-Za-z0-9]{2}\/[A-Za-z0-9]{2}$/.test(path)
-        done()
-
-  describe '#upload()', ->
-    it 'should use default aws path', (done) ->
-      upload._uploadGeneratePath = (prefix, cb) ->
-        assert.equal prefix, upload.opts.aws.path
-        done()
-
-      upload.upload 'dummy.jpg', {}
-
-    it 'should override default aws path', (done) ->
-      upload._uploadGeneratePath = (prefix, cb) ->
-        assert.equal prefix, '/my/new/path'
-        done()
-
-      upload.upload 'dummy.jpg', awsPath: '/my/new/path'
 
 describe 'Image', ->
   image = null
 
   beforeEach ->
     src = __dirname + '/assets/photo.jpg'
-    dest = 'images_test/Wm/PH/f3/I0'
     opts = {}
 
-    image = new Upload.Image src, dest, opts, upload
+    image = new Upload.Image src, opts, upload
+    image.upload._getRandomPath = -> return 'aa/bb/cc'
 
   describe 'constructor', ->
-    it 'should set default values', ->
+    it 'sets default values', ->
       assert image instanceof Upload.Image
-      assert image.config instanceof Upload
       assert.equal image.src, __dirname + '/assets/photo.jpg'
-      assert.equal image.dest, 'images_test/Wm/PH/f3/I0'
-      assert /[a-z0-9]{24}/.test image.tmpName
-      assert.deepEqual image.meta, {}
-      assert.equal typeof image.gm, 'object'
+      assert.deepEqual image.opts, {}
+      assert image.upload instanceof Upload
 
-  describe '#getMeta()', ->
-    it 'should return image metadata', (done) ->
-      @timeout 10000
-      image.getMeta (err, meta) ->
-        assert.ifError err
-        assert.equal meta.format, 'jpeg'
-        assert.equal meta.fileSize, '617' + SIZE
-        assert.equal meta.imageSize.width, 1536
-        assert.equal meta.imageSize.height, 2048
-        assert.equal meta.orientation, 'Undefined'
-        assert.equal meta.colorSpace, COLOR
-        assert.equal meta.compression, 'JPEG'
-        assert.equal meta.quallity, '96'
-        assert.equal meta.exif, undefined
-        done()
-
-    it 'should store image matadata', (done) ->
-      @timeout 10000
-      image.getMeta (err) ->
-        assert.ifError err
-        assert.equal image.meta.format, 'jpeg'
-        assert.equal image.meta.fileSize, '617' + SIZE
-        assert.equal image.meta.imageSize.width, 1536
-        assert.equal image.meta.imageSize.height, 2048
-        assert.equal image.meta.orientation, 'Undefined'
-        assert.equal image.meta.colorSpace, COLOR
-        assert.equal image.meta.compression, 'JPEG'
-        assert.equal image.meta.quallity, '96'
-        assert.equal image.meta.exif, undefined
-        done()
-
-    it 'should return exif data if returnExif is set to true', (done) ->
-      @timeout 10000
-      image.config.opts.returnExif = true
-      image.getMeta (err) ->
-        assert.ifError err
-        assert.equal typeof image.meta.exif, 'object'
-        done()
-
-    it 'should store gm image instance', (done) ->
-      @timeout 10000
-      image.getMeta (err) ->
-        assert.ifError err
-        assert image.gm instanceof require('gm')
-        done()
-
-  describe '#resize()', ->
-    versions = null
+  describe '#_upload()', ->
     beforeEach ->
-      versions = JSON.parse JSON.stringify upload.opts.versions
-      versions[0].suffix = ''
+      image.upload.s3.putObject = (opts, cb) ->
+        process.nextTick -> cb null, ETag: '"f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1"'
 
-      image.src = __dirname + '/assets/photo.jpg'
-      image.gm = gm image.src
-      image.tmpName = 'ed8d8b72071e731dc9065095c92c3e384d7c1e27'
-      image.meta =
-        format: 'jpeg'
-        fileSize: '617' + SIZE
-        imageSize: width: 1536, height: 2048
-        orientation: 'Undefined'
-        colorSpace: 'RGB'
-        compression: 'JPEG'
-        quallity: '96'
-        exif: undefined
+    it 'sets upload key', (done) ->
+      version = path: '/some/image.jpg'
+      image.upload.s3.putObject = (opts, cb) ->
+        assert.equal opts.Key, 'aa/bb/cc.jpg'
+        done()
 
-    it 'should return updated properties for original image', (done) ->
-      @timeout 10000
-      image.resize JSON.parse(JSON.stringify(versions[0])), (err, version) ->
+      image._upload 'aa/bb/cc', version
+
+    it 'sets upload key suffix', (done) ->
+      version = path: '/some/image.jpg', suffix: '-small'
+      image.upload.s3.putObject = (opts, cb) ->
+        assert.equal opts.Key, 'aa/bb/cc-small.jpg'
+        done()
+
+      image._upload 'aa/bb/cc', version
+
+    it 'sets upload key format', (done) ->
+      version = path: '/some/image.png'
+      image.upload.s3.putObject = (opts, cb) ->
+        assert.equal opts.Key, 'aa/bb/cc.png'
+        done()
+
+      image._upload 'aa/bb/cc', version
+
+    it 'sets default ACL', (done) ->
+      version = path: '/some/image.png'
+      image.upload.s3.putObject = (opts, cb) ->
+        assert.equal opts.ACL, upload.opts.aws.acl
+        done()
+
+      image._upload 'aa/bb/cc', version
+
+    it 'sets specific ACL', (done) ->
+      version = path: '/some/image.png', awsImageAcl: 'private'
+      image.upload.s3.putObject = (opts, cb) ->
+        assert.equal opts.ACL, version.awsImageAcl
+        done()
+
+      image._upload 'aa/bb/cc', version
+
+    it 'sets upload body', (done) ->
+      version = path: '/some/image.png'
+      image.upload.s3.putObject = (opts, cb) ->
+        assert opts.Body instanceof require('fs').ReadStream
+        assert.equal opts.Body.path, version.path
+        done()
+
+      image._upload 'aa/bb/cc', version
+
+    it 'sets upload conentet type', (done) ->
+      version = path: '/some/image.png'
+      image.upload.s3.putObject = (opts, cb) ->
+        assert.equal opts.ContentType, 'image/png'
+        done()
+
+      image._upload 'aa/bb/cc', version
+
+    it 'returns etag for uploaded version', (done) ->
+      version = path: '/some/image.jpg'
+      image._upload 'aa/bb/cc', version, (err, version) ->
         assert.ifError err
+        assert.equal version.etag, '"f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1"'
+        done()
+
+    it 'returns url for uploaded version', (done) ->
+      version = path: '/some/image.jpg'
+      image._upload 'aa/bb/cc', version, (err, version) ->
+        assert.ifError err
+        assert.equal version.url, image.upload.opts.url + 'aa/bb/cc.jpg'
+        done()
+
+  describe '#getMetadata()', ->
+    it 'returns image metadata without exif data', (done) ->
+      image.upload.opts.returnExif = false
+      image.getMetadata image.src, (err, metadata) ->
+        assert.ifError err
+
+        assert.deepEqual metadata,
+          path: image.src
+          name: ''
+          size: '617KB'
+          format: 'JPEG'
+          colorspace: 'RGB'
+          height: 2048
+          width: 1536
+          orientation: ''
+
+        done()
+
+    it 'returns image metadata with exif data', (done) ->
+      image.upload.opts.returnExif = true
+      image.getMetadata image.src, (err, metadata) ->
+        assert.ifError err
+        assert.equal Object.keys(metadata).length, 9
+        assert.equal metadata.exif.GPSInfo, '954'
+        done()
+
+  describe '#getDest()', ->
+    it 'returns destination path', (done) ->
+      image.getDest (err, path) ->
+        assert.ifError err
+        assert.equal path, image.upload.opts.aws.path + 'aa/bb/cc'
+        done()
+
+    it 'overrides destination path prefix', (done) ->
+      image.opts.awsPath = 'custom/path/'
+      image.getDest (err, path) ->
+        assert.ifError err
+        assert.equal path, 'custom/path/aa/bb/cc'
+        done()
+
+  describe '#resizeVersions()', ->
+    it 'resizes image versions', (done) ->
+      image.getMetadata image.src, (err, metadata) ->
+        assert.ifError err
+
+        image.resizeVersions (err, versions) ->
+          assert.ifError err
+
+          # Check that resized files exists on disk
+          for version in versions
+            require('fs').statSync version.path
+            require('fs').unlinkSync version.path
+
+          done()
+        , metadata: metadata
+
+  describe '#uploadVersions()', ->
+    it 'uploads image versions', (done) ->
+      i = 0
+      image._upload = (dest, version, cb) ->
+        assert.equal dest, '/foo/bar'
+        assert.equal version, i++
+        cb null, version + 1
+
+      image.upload.opts.original = undefined
+      image.uploadVersions (err, versions) ->
+        assert.ifError err
+
+        assert.deepEqual versions, [1, 2, 3, 4]
+
+        done()
+
+      , versions: [0, 1, 2, 3], dest: '/foo/bar'
+
+    it 'uploads original image', (done) ->
+      image._upload = (dest, version, cb) ->
         assert.deepEqual version,
-          original: true,
           awsImageAcl: 'private'
-          suffix: ''
-          src: image.src
-          format: image.meta.format
-          size: image.meta.fileSize
-          width: image.meta.imageSize.width
-          height: image.meta.imageSize.height
-        done()
+          original: true
+          path: image.src
 
-    it 'should throw error when version original is false', ->
-      assert.throws ->
-        image.resize original: false
-      , '/version.original can not be false/'
+        cb null, version
 
-    it 'should return updated properties for resized image', (done) ->
-      @timeout 10000
-      image.resize JSON.parse(JSON.stringify(versions[1])), (err, version) ->
+      image.upload.opts.original = awsImageAcl: 'private'
+      image.uploadVersions (err, versions) ->
         assert.ifError err
-        assert.deepEqual version,
-          suffix: versions[1].suffix
-          quality: versions[1].quality
-          format: 'jpeg'
-          src: '/tmp/gm-ed8d8b72071e731dc9065095c92c3e384d7c1e27-large.jpeg'
-          width: versions[1].maxWidth
-          height: versions[1].maxHeight
+
+        assert.deepEqual versions, [
+          awsImageAcl: 'private'
+          original: true
+          path: image.src
+        ]
 
         done()
 
-    it 'should write resized image to temp destination', (done) ->
-      @timeout 10000
-      image.resize JSON.parse(JSON.stringify(versions[1])), (err, version) ->
-        assert.ifError err
-        fs.stat version.src, (err, stat) ->
-          assert.ifError err
-          assert.equal typeof stat, 'object'
-          done()
+      , versions: [], dest: '/foo/bar'
 
-    it 'should set hegith and width for reszied image', (done) ->
-      @timeout 10000
-      image.resize JSON.parse(JSON.stringify(versions[1])), (err, version) ->
-        assert.ifError err
-        gm(version.src).size (err, value) ->
-          assert.ifError err
-          assert.deepEqual value,
-            width: 780
-            height: 1040
-          done()
 
-    it 'should set correct orientation for resized image', (done) ->
-      @timeout 10000
-      image.src = __dirname + '/assets/rotate.jpg'
-      image.gm = gm image.src
-      image.meta.orientation = 'TopLeft'
-      image.resize JSON.parse(JSON.stringify(versions[1])), (err, version) ->
-        assert.ifError err
-        gm(version.src).identify (err, value) ->
-          assert.ifError err
-          assert.equal value.Orientation, 'Undefined'
-          assert.equal value.size.width, 585
-          assert.equal value.size.height, 1040
-          done()
+  describe '#removeVersions()', ->
+    unlink = require('fs').unlink
+    results = uploads: []
 
-    it 'should set colorspace to RGB for resized image', (done) ->
-      @timeout 10000
-      image.src = __dirname + '/assets/cmyk.jpg'
-      image.gm = gm image.src
-      image.meta.colorSpace = 'CMYK'
-      image.resize JSON.parse(JSON.stringify(versions[1])), (err, version) ->
-        assert.ifError err
-        gm(version.src).identify (err, value) ->
-          assert.ifError err
-          assert.equal value.Colorspace, COLOR
-          done()
+    beforeEach ->
+      image.upload.opts.cleanup = {}
 
-    it 'should set quality for resized image', (done) ->
-      @timeout 10000
-      versions[1].quality = 50
-      image.src = __dirname + '/assets/photo.jpg'
-      image.gm = gm image.src
-      image.resize JSON.parse(JSON.stringify(versions[1])), (err, version) ->
-        assert.ifError err
-        gm(version.src).identify (err, value) ->
-          assert.ifError err
-          assert.equal value.Quality, versions[1].quality
-          done()
+      results.uploads = [
+        original: true
+        path: '/foo/bar'
+      ,
+        path: '/foo/bar-2'
+      ]
 
-  describe '#upload()', ->
-    it 'should set object Key to correct location on AWS S3'
-    it 'should set ojbect ACL to specified ACL'
-    it 'should set object ACL to default if not specified'
-    it 'should set object Body to version src file'
-    it 'should set object ContentType according to version type'
-    it 'should set object Metadata from default metadata'
-    it 'should set object Metadata from upload metadata'
-    it 'should return updated version object on successfull upload'
+    afterEach ->
+      require('fs').unlink = unlink
 
-  describe '#resizeAndUpload()', ->
-    it 'should set version suffix if not provided'
-    it 'should resize and upload according to image version'
+    it 'keeps all local images', (done) ->
+      require('fs').unlink = (path, cb) ->
+        assert.fail new Error 'unlink shall not be called'
 
-  describe '#exec()', ->
-    it 'should get source image metadata'
-    it 'should make a copy of master version objects array'
-    it 'should resize and upload original image accroding to versions'
+      image.removeVersions done, results
+
+    it 'removes image versions by default', (done) ->
+      require('fs').unlink = (path, cb) ->
+        assert.equal path, results.uploads[1].path
+        cb()
+
+      image.upload.opts.cleanup.versions = true
+      image.removeVersions done, results
+
+    it 'removes original image', (done) ->
+      require('fs').unlink = (path, cb) ->
+        assert.equal path, results.uploads[0].path
+        cb()
+
+      image.upload.opts.cleanup.original = true
+      image.removeVersions done, results
+
+    it 'removes all images', (done) ->
+      i = 0
+      require('fs').unlink = (path, cb) ->
+        assert.equal path, results.uploads[i++].path
+        cb()
+
+      image.upload.opts.cleanup.original = true
+      image.upload.opts.cleanup.versions = true
+      image.removeVersions done, results
 
 describe 'Integration Tests', ->
-  it 'should upload image to new random path', (done) ->
-    @timeout 40000
-    upload.upload __dirname + '/assets/photo.jpg', {}, (err, images, meta) ->
+  beforeEach ->
+    if process.env.INTEGRATION_TEST isnt 'true'
+      upload._getRandomPath = -> return 'aa/bb/cc'
+
+  it 'uploads image to new random path', (done) ->
+    @timeout 10000
+    upload.upload __dirname + '/assets/portrait.jpg', {}, (err, images, meta) ->
       assert.ifError err
 
       for image in images
-        cleanup.push Key: image.path if image.path # clean up in AWS
+        cleanup.push Key: image.key if image.key # clean up in AWS
+
+        assert.equal typeof image.etag, 'string'
+        assert.equal typeof image.path, 'string'
+        assert.equal typeof image.key, 'string'
+        assert.equal typeof image.url, 'string'
 
         if image.original
-          assert.equal typeof image.size, 'string'
-
-        assert.equal typeof image.src, 'string'
-        assert.equal typeof image.format, 'string'
-        assert.equal typeof image.width, 'number'
-        assert.equal typeof image.height, 'number'
-        assert /[0-9a-f]{32}/.test image.etag
-        assert.equal typeof image.path, 'string'
-        assert.equal typeof image.url, 'string'
+          assert.equal image.original, true
+        else
+          assert.equal typeof image.suffix, 'string'
+          assert.equal typeof image.maxHeight, 'number'
+          assert.equal typeof image.maxWidth, 'number'
 
       done()
-
-  it 'should not upload original if not in versions array', (done) ->
-    @timeout 40000
-    upload.opts.versions.shift()
-    upload.upload __dirname + '/assets/photo.jpg', {}, (err, images, meta) ->
-      assert.ifError err
-
-      for image in images
-        cleanup.push Key: image.path if image.path # clean up in AWS
-
-        assert.equal typeof image.original, 'undefined'
-        assert.equal typeof image.src, 'string'
-        assert.equal typeof image.format, 'string'
-        assert.equal typeof image.width, 'number'
-        assert.equal typeof image.height, 'number'
-        assert /[0-9a-f]{32}/.test image.etag
-        assert.equal typeof image.path, 'string'
-        assert.equal typeof image.url, 'string'
-
-      done()
-
