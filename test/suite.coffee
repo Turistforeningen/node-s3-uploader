@@ -223,10 +223,18 @@ describe 'Image', ->
 
       image._upload 'aa/bb/cc', version
 
-    it 'sets upload conentet type', (done) ->
+    it 'sets upload content type for png', (done) ->
       version = path: '/some/image.png'
       image.upload.s3.putObject = (opts, cb) ->
         assert.equal opts.ContentType, 'image/png'
+        done()
+
+      image._upload 'aa/bb/cc', version
+
+    it 'sets upload content type for jpg', (done) ->
+      version = path: '/some/image.jpg'
+      image.upload.s3.putObject = (opts, cb) ->
+        assert.equal opts.ContentType, 'image/jpeg'
         done()
 
       image._upload 'aa/bb/cc', version

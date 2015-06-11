@@ -153,7 +153,7 @@ Image.prototype._upload = (dest, version, cb) ->
     Key: dest + (version.suffix || '') + format
     ACL: version.awsImageAcl or @upload.opts.aws.acl
     Body: fs.createReadStream version.path
-    ContentType: "image/#{format.substr(1)}"
+    ContentType: "image/#{if format is '.jpg' then 'jpeg' else format.substr(1)}"
 
   @upload.s3.putObject options, (err, data) =>
     return cb err if err
