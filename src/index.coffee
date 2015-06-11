@@ -1,5 +1,4 @@
-read      = require('fs').createReadStream
-unling    = require('fs').unlink
+fs        = require('fs')
 extname   = require('path').extname
 
 S3        = require('aws-sdk').S3
@@ -25,30 +24,28 @@ Upload = module.exports = (awsBucketName, @opts = {}) ->
   deprecate '`awsAccessKeyId` is deprecated, use `aws.accessKeyId` instead' if @opts.awsAccessKeyId
   deprecate '`awsSecretAccessKey` is deprecated, use `aws.secretAccessKey` instead' if @opts.awsSecretAccessKey
 
-  @opts.aws         ?= {}
-  @opts.aws.region  ?= @opts.awsBucketRegion  or 'us-east-1'
-  @opts.aws.path    ?= @opts.awsBucketPath    or ''
-  @opts.aws.acl     ?= @opts.awsBucketAcl     or 'privat'
-
-  @opts.aws.sslEnabled      ?= true
-  @opts.aws.maxRetries      ?= @opts.awsMaxRetries or 3
-  @opts.aws.accessKeyId     ?= @opts.awsAccessKeyId
-  @opts.aws.secretAccessKey ?= @opts.awsSecretAccessKey
-
-  @opts.aws.params          ?= {}
-  @opts.aws.params.Bucket   = awsBucketName
-
+  @opts.aws                     ?= {}
+  @opts.aws.accessKeyId         ?= @opts.awsAccessKeyId
+  @opts.aws.acl                 ?= @opts.awsBucketAcl     or 'privat'
   @opts.aws.httpOptions         ?= {}
   @opts.aws.httpOptions.timeout ?= @opts.awsHttpTimeout or 10000
+  @opts.aws.maxRetries          ?= @opts.awsMaxRetries or 3
+  @opts.aws.params              ?= {}
+  @opts.aws.params.Bucket       = awsBucketName
+  @opts.aws.path                ?= @opts.awsBucketPath    or ''
+  @opts.aws.region              ?= @opts.awsBucketRegion  or 'us-east-1'
+  @opts.aws.secretAccessKey     ?= @opts.awsSecretAccessKey
+  @opts.aws.sslEnabled          ?= true
 
-  @opts.versions        ?= []
-  @opts.resizeQuality   ?= 70
-  @opts.returnExif      ?= false
+  @opts.cleanup                 ?= {}
+  @opts.returnExif              ?= false
 
-  @opts.tmpDir          ?= require('os').tmpdir() + '/'
-  @opts.tmpPrefix       ?= 'gm-'
+  @opts.resize                  ?= {}
+  #@opts.resize.path
+  #@opts.resize.prefix
+  @opts.resize.quality          ?= 70
+  @opts.versions                ?= []
 
-  @opts.workers         ?= 1
   @opts.url ?= "https://s3-#{@opts.aws.region}.amazonaws.com/#{@opts.aws.params.Bucket}/"
 
   @s3 = new S3 @opts.aws
@@ -75,7 +72,6 @@ Upload.prototype._getRandomPath = ->
 Upload.prototype._getDestPath = (prefix, callback) ->
   retry 5, (cb) =>
     path = prefix + @_getRandomPath()
-
     @s3.listObjects Prefix: path, (err, data) ->
       return cb err if err
       return cb null, path if data.Contents.length is 0
@@ -86,12 +82,16 @@ Upload.prototype._getDestPath = (prefix, callback) ->
 # Upload a new image to the S3 bucket
 ##
 Upload.prototype.upload = (src, opts, cb) ->
-  new Image src, opts, @, cb
+  image = new Image src, opts, @
+  image.start(cb)
 
 ##
 # Image upload
 ##
-Image = module.exports.Image = (@src, @opts, @upload, cb) ->
+Image = module.exports.Image = (@src, @opts, @upload) ->
+  @
+
+Image.prototype.start = (cb) ->
   auto
     metadata: @getMetadata.bind(@, @src)
     dest: @getDest.bind(@)
@@ -118,8 +118,12 @@ Image.prototype.getDest = (cb) ->
 # Resize image
 ##
 Image.prototype.resizeVersions = (cb, results) ->
-  versions = JSON.parse JSON.stringify @upload.opts.versions
-  resize results.metadata, versions, cb
+  resize results.metadata,
+    path: @upload.opts.resize.path
+    prefix: @upload.opts.resize.prefix
+    quality: @upload.opts.resize.quality
+    versions: JSON.parse JSON.stringify @upload.opts.versions
+  , cb
 
 ##
 # Upload resized versions
@@ -127,9 +131,9 @@ Image.prototype.resizeVersions = (cb, results) ->
 Image.prototype.uploadVersions = (cb, results) ->
   if @upload.opts.original
     results.versions.push
-      path: @src
-      suffix: @upload.opts.original.suffix or ''
       awsImageAcl: @upload.opts.original.awsImageAcl
+      original: true
+      path: @src
 
   map results.versions, @_upload.bind(@, results.dest), cb
 
@@ -137,10 +141,14 @@ Image.prototype.uploadVersions = (cb, results) ->
 # Clean up local copies
 ##
 Image.prototype.removeVersions = (cb, results) ->
-  return cb null if not @upload.opts.cleanup
-  each results.uploads, (image, callback) ->
-    unlink image.path, callback
-  , cb
+  each results.uploads, (image, callback) =>
+    if not @upload.opts.cleanup.original and image.original \
+      or not @upload.opts.cleanup.versions and not image.original
+        return setTimeout callback, 0
+
+    fs.unlink image.path, callback
+  , (err) ->
+    cb()
 
 ##
 # Upload image version to S3
@@ -149,15 +157,15 @@ Image.prototype._upload = (dest, version, cb) ->
   format = extname version.path
 
   options =
-    Key: dest + version.suffix + format
+    Key: dest + (version.suffix || '') + format
     ACL: version.awsImageAcl or @upload.opts.aws.acl
-    Body: read version.path
+    Body: fs.createReadStream version.path
     ContentType: "image/#{format.substr(1)}"
 
   @upload.s3.putObject options, (err, data) =>
     return cb err if err
 
-    version.etag = data.ETag.substr(1, data.ETag.length-2)
+    version.etag = data.ETag
     version.key = options.Key
     version.url = @upload.opts.url + options.Key if @upload.opts.url
 
