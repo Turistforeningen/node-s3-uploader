@@ -298,11 +298,11 @@ describe 'Image', ->
         assert.equal path, image.upload.opts.aws.path + 'aa/bb/cc'
         done()
 
-    it 'overrides destination path prefix', ->
-      image.awsPath = 'some/path/'
+    it 'overrides destination path prefix', (done) ->
+      image.opts.awsPath = 'custom/path/'
       image.getDest (err, path) ->
         assert.ifError err
-        assert.equal path, 'some/path/aa/bb/cc'
+        assert.equal path, 'custom/path/aa/bb/cc'
         done()
 
   describe '#resizeVersions()', ->
