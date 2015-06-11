@@ -10,8 +10,8 @@
     "build": "coffee --bare --compile --output lib/ src/*.coffee",
     "prepublish": "coffee --bare --compile --output lib/ src/*.coffee",
     "postpublish": "rm -rf lib/*",
-    "test": "mocha test/suite.coffee -R spec --compilers coffee:coffee-script/register,litcoffee:coffee-script/register",
-    "watch": "./node_modules/.bin/mocha -w -b -c --check-leaks test/suite.coffee -R progress --compilers coffee:coffee-script/register,litcoffee:coffee-script/register"
+    "test": "TMPDIR=/tmp mocha test/suite.coffee -R spec --compilers coffee:coffee-script/register,litcoffee:coffee-script/register",
+    "watch": "TMPDIR=/tmp ./node_modules/.bin/mocha -w -b -c --check-leaks test/suite.coffee -R progress --compilers coffee:coffee-script/register,litcoffee:coffee-script/register"
   },
   "repository": {
     "type": "git",
