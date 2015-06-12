@@ -42,7 +42,7 @@
   "dependencies": {
     "async": "~1.2",
     "aws-sdk": "~2.1",
-    "im-resize": "~2.0",
+    "im-resize": "~2.1",
     "im-metadata": "~2.1"
   },
   "engines": {
