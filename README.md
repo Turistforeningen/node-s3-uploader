@@ -67,6 +67,7 @@ var Upload = require('s3-uploader');
   * **object[]** `versions`
     * **string** `suffix` - image file name suffix (**default** `""`)
     * **number** `quality` - image resize quality
+    * **string** `format` - force output image file format (**default** `format of original image`)
     * **number** `maxWidth` - max width for resized image
     * **number** `maxHeight` - max height for resized image
     * **string** `aspect` - force aspect ratio for resized image (**example:** `4:3`
@@ -104,6 +105,7 @@ var client = new Upload('my_s3_bucket', {
   versions: [{
     maxHeight: 1040,
     maxWidth: 1040,
+    format: 'jpg',
     suffix: '-large',
     quality: 80
   },{
