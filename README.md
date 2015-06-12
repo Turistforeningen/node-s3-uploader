@@ -52,16 +52,12 @@ var Upload = require('s3-uploader');
 
   * **string** `url` - custom public url (**default** build from `region` and `awsBucketName`)
 
-  * **object** `aws`
+  * **object** `aws` - see [note](#aws-note)
     * **string** `region` - region for you bucket (**default** `us-east-1`)
     * **string** `path` - path within your bucket (**default** `""`)
     * **string** `acl` - default ACL for uploaded images (**default** `privat`)
     * **string** `accessKeyId` - AWS access key ID override
     * **string** `secretAccessKey` - AWS secret access key override
-
-> The `aws` object is passed directly to `aws-sdk`. You can add any of [these
-> options](http://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/S3.html#constructor_details)
-> in order to fine tune the connection – if you know what you are doing.
 
   * **object** `resize`
     * **string** `path` - local directory for resized images (**default**: same as original image)
@@ -80,6 +76,11 @@ var Upload = require('s3-uploader');
 
   * **object** `original`
     * **string** `awsImageAcl` - access control for AWS S3 upload (**example:** `private`)
+
+#### AWS note
+> The `aws` object is passed directly to `aws-sdk`. You can add any of [these
+> options](http://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/S3.html#constructor_details)
+> in order to fine tune the connection – if you know what you are doing.
 
 #### Example
 
