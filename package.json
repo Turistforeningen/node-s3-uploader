@@ -36,8 +36,8 @@
   },
   "homepage": "https://github.com/Turistforeningen/node-s3-uploader",
   "devDependencies": {
-    "coffee-script": "~1.9.1",
-    "mocha": "~2.2.1"
+    "coffee-script": "~1",
+    "mocha": "~2"
   },
   "dependencies": {
     "async": "~1.2",
