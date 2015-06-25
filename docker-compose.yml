@@ -1,5 +1,5 @@
 dev:
-  image: starefossen/iojs-imagemagick:1-6
+  image: starefossen/iojs-imagemagick:2-6
   working_dir: /usr/src/app
   volumes:
     - ".:/usr/src/app"
