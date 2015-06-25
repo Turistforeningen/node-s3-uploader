@@ -10,6 +10,7 @@
     "build": "coffee --bare --compile --output lib/ src/*.coffee",
     "prepublish": "coffee --bare --compile --output lib/ src/*.coffee",
     "postpublish": "rm -rf lib/*",
+    "hint": "./node_modules/.bin/coffeelint src test",
     "test": "mocha test/suite.coffee -R spec --compilers coffee:coffee-script/register,litcoffee:coffee-script/register",
     "watch": "./node_modules/.bin/mocha -w -b -c --check-leaks test/suite.coffee -R progress --compilers coffee:coffee-script/register,litcoffee:coffee-script/register"
   },
@@ -37,6 +38,7 @@
   "homepage": "https://github.com/Turistforeningen/node-s3-uploader",
   "devDependencies": {
     "coffee-script": "~1",
+    "coffeelint": "~1",
     "mocha": "~2"
   },
   "dependencies": {
