@@ -25,7 +25,8 @@
     "image",
     "resize",
     "rename",
-    "upload"
+    "upload",
+    "versions"
   ],
   "contributors": [
     "Håvard Ranum <havard.ranum@bouvet.no>",
