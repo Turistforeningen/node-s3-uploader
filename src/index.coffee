@@ -98,7 +98,7 @@ Image.prototype.start = (cb) ->
 # Get image metadata
 ##
 Image.prototype.getMetadata = (src, cb) ->
-  metadata src, exif: @upload.opts.returnExif, cb
+  metadata src, exif: @upload.opts.returnExif, autoOrient: true, cb
 
 ##
 # Get image destination
