@@ -11,8 +11,8 @@ retry     = require('async').retry
 resize    = require 'im-resize'
 metadata  = require 'im-metadata'
 
-Upload = module.exports = (awsBucketName, @opts = {}) ->
-  throw new TypeError 'Bucket name can not be undefined' if not awsBucketName
+Upload = module.exports = (bucketName, @opts = {}) ->
+  throw new TypeError 'Bucket name can not be undefined' if not bucketName
 
   @opts.aws                     ?= {}
   #@opts.aws.accessKeyId
@@ -136,8 +136,8 @@ Image.prototype.uploadVersions = (cb, results) ->
 Image.prototype.removeVersions = (cb, results) ->
   each results.uploads, (image, callback) =>
     if not @upload.opts.cleanup.original and image.original \
-      or not @upload.opts.cleanup.versions and not image.original
-        return setTimeout callback, 0
+    or not @upload.opts.cleanup.versions and not image.original
+      return setTimeout callback, 0
 
     fs.unlink image.path, callback
   , (err) ->

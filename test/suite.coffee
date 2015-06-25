@@ -89,8 +89,8 @@ describe 'Upload', ->
         url: 'https://s3.amazonaws.com/myBucket/'
 
     it 'sets default url based on AWS region', ->
-      upload = new Upload 'myBucket', aws: region: 'my-region-1'
-      assert.equal upload.opts.url, 'https://s3-my-region-1.amazonaws.com/myBucket/'
+      upload = new Upload 'b', aws: region: 'my-region-1'
+      assert.equal upload.opts.url, 'https://s3-my-region-1.amazonaws.com/b/'
 
     it 'sets custom url', ->
       upload = new Upload 'myBucket', url: 'http://cdn.app.com/'
@@ -126,14 +126,18 @@ describe 'Upload', ->
       upload._getRandomPath = -> return 'aa/bb/cc'
 
     it 'returns a random avaiable path', (done) ->
-      upload.s3.listObjects = (opts, cb) -> process.nextTick -> cb null, Contents: []
+      upload.s3.listObjects = (opts, cb) ->
+        process.nextTick -> cb null, Contents: []
+
       upload._getDestPath 'some/prefix/', (err, path) ->
         assert.ifError err
         assert.equal path, 'some/prefix/aa/bb/cc'
         done()
 
     it 'returns error if no available path can be found', (done) ->
-      upload.s3.listObjects = (opts, cb) -> process.nextTick -> cb null, Contents: [opts.Prefix]
+      upload.s3.listObjects = (opts, cb) ->
+        process.nextTick -> cb null, Contents: [opts.Prefix]
+
       upload._getDestPath 'some/prefix/', (err, path) ->
         assert err instanceof Error
         assert.equal err.message, 'Path some/prefix/aa/bb/cc not avaiable'
