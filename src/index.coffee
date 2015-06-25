@@ -11,8 +11,8 @@ retry     = require('async').retry
 resize    = require 'im-resize'
 metadata  = require 'im-metadata'
 
-Upload = module.exports = (awsBucketName, @opts = {}) ->
-  throw new TypeError 'Bucket name can not be undefined' if not awsBucketName
+Upload = module.exports = (bucketName, @opts = {}) ->
+  throw new TypeError 'Bucket name can not be undefined' if not bucketName
 
   @opts.aws                     ?= {}
   #@opts.aws.accessKeyId
@@ -21,7 +21,7 @@ Upload = module.exports = (awsBucketName, @opts = {}) ->
   @opts.aws.httpOptions.timeout ?= 10000
   @opts.aws.maxRetries          ?= 3
   @opts.aws.params              ?= {}
-  @opts.aws.params.Bucket       = awsBucketName
+  @opts.aws.params.Bucket       = bucketName
   @opts.aws.path                ?= ''
   @opts.aws.region              ?= 'us-east-1'
   #@opts.aws.secretAccessKey
@@ -37,9 +37,9 @@ Upload = module.exports = (awsBucketName, @opts = {}) ->
   @opts.versions                ?= []
 
   if not @opts.url and @opts.aws.region is 'us-east-1'
-    @opts.url ?= "https://s3.amazonaws.com/#{@opts.aws.params.Bucket}/"
+    @opts.url ?= "https://s3.amazonaws.com/#{bucketName}/"
   else if not @opts.url
-    @opts.url ?= "https://s3-#{@opts.aws.region}.amazonaws.com/#{@opts.aws.params.Bucket}/"
+    @opts.url ?= "https://s3-#{@opts.aws.region}.amazonaws.com/#{bucketName}/"
 
   @s3 = new S3 @opts.aws
 
@@ -136,8 +136,8 @@ Image.prototype.uploadVersions = (cb, results) ->
 Image.prototype.removeVersions = (cb, results) ->
   each results.uploads, (image, callback) =>
     if not @upload.opts.cleanup.original and image.original \
-      or not @upload.opts.cleanup.versions and not image.original
-        return setTimeout callback, 0
+    or not @upload.opts.cleanup.versions and not image.original
+      return setTimeout callback, 0
 
     fs.unlink image.path, callback
   , (err) ->
