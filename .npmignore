@@ -14,14 +14,15 @@ results
 
 node_modules/
 test_output/
-.vagrant/
 env/
 src/
 test/
 utils/
 
-Vagrantfile
+docker-compose.yml
+wercker.yml
 
+.vim.custom
 .gitignore
 .npmignore
 .DS_Store
