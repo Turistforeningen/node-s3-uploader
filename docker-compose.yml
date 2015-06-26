@@ -6,4 +6,7 @@ dev:
   command: "npm run watch"
   env_file: .env
   environment:
-    NODE_ENV: development
+    - NODE_ENV=development
+    - NPM_CONFIG_LOGLEVEL=info
+    - NPM_PACKAGE_CONFIG_UNSAFE_PERM=true
+    - NPM_CONFIG_UNSAFE_PERM=true
