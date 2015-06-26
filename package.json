@@ -11,8 +11,8 @@
     "prepublish": "./node_modules/.bin/coffee -c -b -o lib/ src/*.coffee",
     "postpublish": "rm -rf lib/*",
     "hint": "./node_modules/.bin/coffeelint src test",
-    "test": "mocha test/suite.coffee -R spec --compilers coffee:coffee-script/register,litcoffee:coffee-script/register",
-    "watch": "./node_modules/.bin/mocha -w -b -c --check-leaks test/suite.coffee -R progress --compilers coffee:coffee-script/register,litcoffee:coffee-script/register"
+    "test": "./node_modules/.bin/mocha --compilers coffee:coffee-script/register test/suite.coffee",
+    "watch": "./node_modules/.bin/mocha -w -b -c --check-leaks -R progress --compilers coffee:coffee-script/register test/suite.coffee"
   },
   "repository": {
     "type": "git",
