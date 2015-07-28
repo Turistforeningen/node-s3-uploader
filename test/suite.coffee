@@ -18,22 +18,21 @@ beforeEach ->
     versions: [{
       maxHeight: 1040
       maxWidth: 1040
+      format: 'jpg'
       suffix: '-large'
       quality: 80
     },{
-      maxHeight: 780
       maxWidth: 780
       aspect: '3:2!h'
       suffix: '-medium'
     },{
-      maxHeight: 320
       maxWidth: 320
       aspect: '16:9!h'
       suffix: '-small'
     },{
       maxHeight: 100
-      maxWidth: 100
       aspect: '1:1'
+      format: 'png'
       suffix: '-thumb1'
     },{
       maxHeight: 250
@@ -336,6 +335,8 @@ describe 'Image', ->
         assert.deepEqual version,
           awsImageAcl: 'private'
           original: true
+          width: 111
+          height: 222
           path: image.src
 
         cb null, version
@@ -347,12 +348,14 @@ describe 'Image', ->
         assert.deepEqual versions, [
           awsImageAcl: 'private'
           original: true
+          width: 111
+          height: 222
           path: image.src
         ]
 
         done()
 
-      , versions: [], dest: '/foo/bar'
+      , versions: [], dest: '/foo/bar', metadata: width: 111, height: 222
 
 
   describe '#removeVersions()', ->
@@ -426,7 +429,7 @@ describe 'Integration Tests', ->
           assert.equal image.original, true
         else
           assert.equal typeof image.suffix, 'string'
-          assert.equal typeof image.maxHeight, 'number'
-          assert.equal typeof image.maxWidth, 'number'
+          assert.equal typeof image.height, 'number'
+          assert.equal typeof image.width, 'number'
 
       done()
