@@ -18,22 +18,21 @@ beforeEach ->
     versions: [{
       maxHeight: 1040
       maxWidth: 1040
+      format: 'jpg'
       suffix: '-large'
       quality: 80
     },{
-      maxHeight: 780
       maxWidth: 780
       aspect: '3:2!h'
       suffix: '-medium'
     },{
-      maxHeight: 320
       maxWidth: 320
       aspect: '16:9!h'
       suffix: '-small'
     },{
       maxHeight: 100
-      maxWidth: 100
       aspect: '1:1'
+      format: 'png'
       suffix: '-thumb1'
     },{
       maxHeight: 250
