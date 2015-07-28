@@ -149,11 +149,12 @@ Image.prototype.removeVersions = (cb, results) ->
 # Upload image version to S3
 ##
 Image.prototype._upload = (dest, version, cb) ->
+  version.awsImageAcl ?= @upload.opts.aws.acl
   format = extname(version.path).substr(1).toLowerCase()
 
   options =
     Key: "#{dest}#{version.suffix or ''}.#{format}"
-    ACL: version.awsImageAcl or @upload.opts.aws.acl
+    ACL: version.awsImageAcl
     Body: fs.createReadStream version.path
     ContentType: "image/#{if format is 'jpg' then 'jpeg' else format}"
 
