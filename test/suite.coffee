@@ -336,6 +336,8 @@ describe 'Image', ->
         assert.deepEqual version,
           awsImageAcl: 'private'
           original: true
+          width: 111
+          height: 222
           path: image.src
 
         cb null, version
@@ -347,12 +349,14 @@ describe 'Image', ->
         assert.deepEqual versions, [
           awsImageAcl: 'private'
           original: true
+          width: 111
+          height: 222
           path: image.src
         ]
 
         done()
 
-      , versions: [], dest: '/foo/bar'
+      , versions: [], dest: '/foo/bar', metadata: width: 111, height: 222
 
 
   describe '#removeVersions()', ->

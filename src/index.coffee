@@ -126,6 +126,8 @@ Image.prototype.uploadVersions = (cb, results) ->
     results.versions.push
       awsImageAcl: @upload.opts.original.awsImageAcl
       original: true
+      width: results.metadata.width
+      height: results.metadata.height
       path: @src
 
   map results.versions, @_upload.bind(@, results.dest), cb
