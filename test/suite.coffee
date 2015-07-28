@@ -426,7 +426,7 @@ describe 'Integration Tests', ->
           assert.equal image.original, true
         else
           assert.equal typeof image.suffix, 'string'
-          assert.equal typeof image.maxHeight, 'number'
-          assert.equal typeof image.maxWidth, 'number'
+          assert.equal typeof image.height, 'number'
+          assert.equal typeof image.width, 'number'
 
       done()
