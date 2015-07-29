@@ -147,14 +147,13 @@ var client = new Upload('my_s3_bucket', {
 #### Example
 
 ```javascript
-client.upload('/some/file/path.jpg', {}, function(err, images, meta) {
-  if (err) {
-    console.error(err);
-  } else {
-    for (var i = 0; i < images.length; i++) {
-      console.log('Thumbnail with width %i, height %i, at %s', images[i].width, images[i].height, images[i].url);
-    }
-  }
+client.upload('/some/image.jpg', {}, function(err, versions, meta) {
+  if (err) { throw err; }
+
+  versions.forEach(function(image) {
+    console.log(image.width, image.height, image.url);
+    // 1234 4567 https://my-bucket.s3.amazonaws.com/path/ab/cd/ef.jpg
+  });
 });
 ```
 
