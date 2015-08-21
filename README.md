@@ -15,6 +15,8 @@ and [im-resize](https://github.com/Turistforeningen/node-im-resize) and
 [im-metadata](https://github.com/Turistforeningen/node-im-metadata) for image
 processing.
 
+![Overview of image upload to AWS S3](https://docs.google.com/drawings/d/1EZaE8LaQ6FRSg4R-2QQiT1af-y2AgDknBGrx6SPIKy0/pub?w=766&h=216)
+
 [![Join the chat at https://gitter.im/Turistforeningen/node-s3-uploader](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/Turistforeningen/node-s3-uploader)
 
 ## Changelog
