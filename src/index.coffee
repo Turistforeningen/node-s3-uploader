@@ -41,23 +41,11 @@ Upload = module.exports = (bucketName, @opts = {}) ->
   else if not @opts.url
     @opts.url ?= "https://s3-#{@opts.aws.region}.amazonaws.com/#{bucketName}/"
 
+  @._getRandomPath = @opts.randomPath or require('@starefossen/rand-path')
+
   @s3 = new S3 @opts.aws
 
   @
-
-##
-# Generate a random path on the form /xx/yy/zz
-##
-Upload.prototype._getRandomPath = ->
-  input = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
-  res = []
-
-  for i in [1..3]
-    x = input[Math.floor((Math.random() * input.length))]
-    y = input[Math.floor((Math.random() * input.length))]
-    res.push x + y
-
-  return res.join '/'
 
 ##
 # Generate a random avaiable path on the S3 bucket
