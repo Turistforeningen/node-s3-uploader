@@ -123,7 +123,14 @@ describe 'Upload', ->
   describe '#_getRandomPath()', ->
     it 'returns a new random path', ->
       path = upload._getRandomPath()
-      assert(/^[A-Za-z0-9]{2}\/[A-Za-z0-9]{2}\/[A-Za-z0-9]{2}$/.test(path))
+      assert(/^\w{2}(\/\w{2}){2}$/.test(path))
+
+    it 'returns custom random path', ->
+      upload = new Upload process.env.AWS_BUCKET_NAME,
+        randomPath: require('uuid').v1
+
+      path = upload._getRandomPath()
+      assert(/^\w+(-\w+){4}$/.test(path))
 
   describe '#_getDestPath()', ->
     beforeEach ->

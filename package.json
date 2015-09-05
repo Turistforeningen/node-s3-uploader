@@ -40,9 +40,11 @@
   "devDependencies": {
     "coffee-script": "~1",
     "coffeelint": "~1",
-    "mocha": "~2"
+    "mocha": "~2",
+    "uuid": "^2"
   },
   "dependencies": {
+    "@starefossen/rand-path": "^1.0.1",
     "async": "~1.4",
     "aws-sdk": "~2.1",
     "im-resize": "~2.3",
