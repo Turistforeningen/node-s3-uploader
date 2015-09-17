@@ -59,7 +59,7 @@ var Upload = require('s3-uploader');
   * **object** `aws` - see [note](#aws-note)
     * **string** `region` - region for you bucket (**default** `us-east-1`)
     * **string** `path` - path within your bucket (**default** `""`)
-    * **string** `acl` - default ACL for uploaded images (**default** `privat`)
+    * **string** `acl` - default ACL for uploaded images (**default** `private`)
     * **string** `accessKeyId` - AWS access key ID override
     * **string** `secretAccessKey` - AWS secret access key override
 
