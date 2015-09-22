@@ -16,7 +16,7 @@ Upload = module.exports = (bucketName, @opts = {}) ->
 
   @opts.aws                     ?= {}
   #@opts.aws.accessKeyId
-  @opts.aws.acl                 ?= 'privat'
+  @opts.aws.acl                 ?= 'private'
   @opts.aws.httpOptions         ?= {}
   @opts.aws.httpOptions.timeout ?= 10000
   @opts.aws.maxRetries          ?= 3

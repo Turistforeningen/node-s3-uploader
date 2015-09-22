@@ -74,7 +74,7 @@ describe 'Upload', ->
       assert upload.s3 instanceof require('aws-sdk').S3
       assert.deepEqual upload.opts,
         aws:
-          acl: 'privat'
+          acl: 'private'
           httpOptions: timeout: 10000
           maxRetries: 3
           params: Bucket: 'myBucket'
