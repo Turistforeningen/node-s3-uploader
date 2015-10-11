@@ -10,6 +10,9 @@ beforeEach ->
       path: process.env.AWS_BUCKET_PATH
       region: process.env.AWS_BUCKET_REGION
       acl: 'public-read'
+    output:
+      youtpath: 'customyourpath'
+      filename: 'newimage'
     cleanup:
       versions: true
       original: false

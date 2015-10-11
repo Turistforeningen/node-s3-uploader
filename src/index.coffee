@@ -64,7 +64,16 @@ Upload.prototype._getRandomPath = ->
 ##
 Upload.prototype._getDestPath = (prefix, callback) ->
   retry 5, (cb) =>
-    path = prefix + @_getRandomPath()
+    if @opts.output
+      if @opts.output.yourpath and @opts.output.filename
+        path_and_filename = @opts.output.yourpath + '/' + @opts.output.filename
+      else
+        path_and_filename = @_getRandomPath()
+    else
+      path_and_filename = @_getRandomPath()
+
+    path = prefix + path_and_filename
+
     @s3.listObjects Prefix: path, (err, data) ->
       return cb err if err
       return cb null, path if data.Contents.length is 0

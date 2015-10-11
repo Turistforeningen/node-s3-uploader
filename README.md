@@ -63,6 +63,10 @@ var Upload = require('s3-uploader');
     * **string** `accessKeyId` - AWS access key ID override
     * **string** `secretAccessKey` - AWS secret access key override
 
+  * **object** `output`
+    * **string** `yourpath` - custom your file path on s3
+    * **string** `filename` - custom your file name on s3
+
   * **object** `resize`
     * **string** `path` - local directory for resized images (**default**: same as original image)
     * **string** `prefix` - local file name prefix for resized images (**default**: `""`)
@@ -95,6 +99,11 @@ var client = new Upload('my_s3_bucket', {
     path: 'images/',
     region: 'us-east-1',
     acl: 'public-read'
+  },
+
+  output: {
+    yourpath: 'custom/yourpath',
+    filename: 'new_imagename'
   },
 
   cleanup: {
