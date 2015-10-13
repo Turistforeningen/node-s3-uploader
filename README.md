@@ -86,6 +86,8 @@ var Upload = require('s3-uploader');
     * **number** `awsImageExpires` - add `Expires` header to image version
     * **number** `awsImageCacheControl` - add `Cache-Control` header to image version
 
+  * **function** `randomPath` - custom random path function
+
 #### AWS note
 > The `aws` object is passed directly to `aws-sdk`. You can add any of [these
 > options](http://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/S3.html#constructor_details)
