@@ -15,6 +15,7 @@ beforeEach ->
       original: false
     original:
       awsImageAcl: 'private'
+      awsImageMaxAge: 31536000
     versions: [{
       maxHeight: 1040
       maxWidth: 1040
@@ -34,11 +35,15 @@ beforeEach ->
       aspect: '1:1'
       format: 'png'
       suffix: '-thumb1'
+      awsImageExpires: 31536000
+      cacheControl: 31536000
     },{
       maxHeight: 250
       maxWidth: 250
       aspect: '1:1'
       suffix: '-thumb2'
+      awsImageExpires: 31536000
+      cacheControl: 31536000
     }]
 
   # Mock S3 API calls
@@ -242,6 +247,22 @@ describe 'Image', ->
 
       image._upload 'aa/bb/cc', version
 
+    it 'sets upload expire header for version', (done) ->
+      version = path: '/some/image.jpg', awsImageExpires: 1234
+      image.upload.s3.putObject = (opts, cb) ->
+        assert opts.Expires - Date.now() <= 1234
+        done()
+
+      image._upload 'aa/bb/cc', version
+
+    it 'sets upload cache-control header for version', (done) ->
+      version = path: '/some/image.jpg', awsImageMaxAge: 1234
+      image.upload.s3.putObject = (opts, cb) ->
+        assert.equal opts.CacheControl, 'public, max-age=1234'
+        done()
+
+      image._upload 'aa/bb/cc', version
+
     it 'returns etag for uploaded version', (done) ->
       version = path: '/some/image.jpg'
       image._upload 'aa/bb/cc', version, (err, version) ->
@@ -333,7 +354,9 @@ describe 'Image', ->
     it 'uploads original image', (done) ->
       image._upload = (dest, version, cb) ->
         assert.deepEqual version,
-          awsImageAcl: 'private'
+          awsImageAcl: 'public'
+          awsImageExpires: 31536000
+          awsImageMaxAge: 31536000
           original: true
           width: 111
           height: 222
@@ -341,12 +364,18 @@ describe 'Image', ->
 
         cb null, version
 
-      image.upload.opts.original = awsImageAcl: 'private'
+      image.upload.opts.original =
+        awsImageAcl: 'public'
+        awsImageExpires: 31536000
+        awsImageMaxAge: 31536000
+
       image.uploadVersions (err, versions) ->
         assert.ifError err
 
         assert.deepEqual versions, [
-          awsImageAcl: 'private'
+          awsImageAcl: 'public'
+          awsImageExpires: 31536000
+          awsImageMaxAge: 31536000
           original: true
           width: 111
           height: 222

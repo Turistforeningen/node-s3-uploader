@@ -78,9 +78,13 @@ var Upload = require('s3-uploader');
     * **string** `background` - set background for transparent images (**example:** `red`)
     * **boolean** `flatten` - flatten backgrund for transparent images
     * **string** `awsImageAcl` - access control for AWS S3 upload (**example:** `private`)
+    * **number** `awsImageExpires` - add `Expires` header to image version
+    * **number** `awsImageCacheControl` - add `Cache-Control` header to image version
 
   * **object** `original`
     * **string** `awsImageAcl` - access control for AWS S3 upload (**example:** `private`)
+    * **number** `awsImageExpires` - add `Expires` header to image version
+    * **number** `awsImageCacheControl` - add `Cache-Control` header to image version
 
 #### AWS note
 > The `aws` object is passed directly to `aws-sdk`. You can add any of [these

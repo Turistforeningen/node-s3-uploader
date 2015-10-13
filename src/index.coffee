@@ -123,12 +123,13 @@ Image.prototype.resizeVersions = (cb, results) ->
 ##
 Image.prototype.uploadVersions = (cb, results) ->
   if @upload.opts.original
-    results.versions.push
-      awsImageAcl: @upload.opts.original.awsImageAcl
-      original: true
-      width: results.metadata.width
-      height: results.metadata.height
-      path: @src
+    org = JSON.parse(JSON.stringify(@upload.opts.original))
+    org.original  = true
+    org.width     = results.metadata.width
+    org.height    = results.metadata.height
+    org.path      = @src
+
+    results.versions.push org
 
   map results.versions, @_upload.bind(@, results.dest), cb
 
@@ -157,6 +158,12 @@ Image.prototype._upload = (dest, version, cb) ->
     ACL: version.awsImageAcl
     Body: fs.createReadStream version.path
     ContentType: "image/#{if format is 'jpg' then 'jpeg' else format}"
+
+  if version.awsImageExpires
+    options.Expires = new Date(Date.now() + version.awsImageExpires)
+
+  if version.awsImageMaxAge
+    options.CacheControl = "public, max-age=#{version.awsImageMaxAge}"
 
   @upload.s3.putObject options, (err, data) =>
     return cb err if err
