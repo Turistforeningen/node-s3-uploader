@@ -93,6 +93,11 @@ Image.prototype.getMetadata = (src, cb) ->
 ##
 Image.prototype.getDest = (cb) ->
   prefix = @opts?.awsPath or @upload.opts.aws.path
+
+  if @opts.path
+    return process.nextTick =>
+      cb null, prefix + @opts.path
+
   @upload._getDestPath prefix, cb
 
 ##

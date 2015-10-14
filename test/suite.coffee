@@ -324,6 +324,21 @@ describe 'Image', ->
         assert.equal path, 'custom/path/aa/bb/cc'
         done()
 
+    it 'returns fixed upload path', (done) ->
+      image.opts.path = 'my/image'
+      image.getDest (err, path) ->
+        assert.ifError err
+        assert.equal path, 'images_test/my/image'
+        done()
+
+    it 'returns fixed upload path with custom prefix', (done) ->
+      image.opts.awsPath = 'custom/path/'
+      image.opts.path = 'my/image'
+      image.getDest (err, path) ->
+        assert.ifError err
+        assert.equal path, 'custom/path/my/image'
+        done()
+
   describe '#resizeVersions()', ->
     it 'resizes image versions', (done) ->
       image.getMetadata image.src, (err, metadata) ->
@@ -459,6 +474,34 @@ describe 'Integration Tests', ->
         assert.equal typeof image.etag, 'string'
         assert.equal typeof image.path, 'string'
         assert.equal typeof image.key, 'string'
+        /^images_test(\/[\w]{2}){3}/.test image.key
+        assert.equal typeof image.url, 'string'
+
+        if image.original
+          assert.equal image.original, true
+        else
+          assert.equal typeof image.suffix, 'string'
+          assert.equal typeof image.height, 'number'
+          assert.equal typeof image.width, 'number'
+
+      done()
+
+  it 'uploads image to fixed path', (done) ->
+    @timeout 10000
+
+    file = __dirname + '/assets/portrait.jpg'
+    opts = path: 'path/to/image'
+
+    upload.upload file, opts, (err, images, meta) ->
+      assert.ifError err
+
+      for image in images
+        cleanup.push Key: image.key if image.key # clean up in AWS
+
+        assert.equal typeof image.etag, 'string'
+        assert.equal typeof image.path, 'string'
+        assert.equal typeof image.key, 'string'
+        /^images_test\/path\/to\/image/.test image.key
         assert.equal typeof image.url, 'string'
 
         if image.original
