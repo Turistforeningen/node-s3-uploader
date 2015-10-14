@@ -146,6 +146,7 @@ var client = new Upload('my_s3_bucket', {
 
 * **object** `opts`
   * **string** `awsPath` - override the path on AWS set through `opts.aws.path`
+  * **string** `path` - set absolute path for uploaded image (disables random path)
 
 * **function** `cb` - callback function (**Error** `err`, **object[]** `versions`, **object** `meta`)
   * **Error** `err` - `null` if everything went fine
