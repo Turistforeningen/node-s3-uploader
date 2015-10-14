@@ -97,7 +97,7 @@ describe 'Upload', ->
       assert.equal upload.opts.url, 'https://s3-my-region-1.amazonaws.com/b/'
 
     it 'sets custom url', ->
-      upload = new Upload 'myBucket', url: 'http://cdn.app.com/'
+      upload = new Upload 'b', url: 'http://cdn.app.com/'
       assert.equal upload.opts.url, 'http://cdn.app.com/'
 
     it 'connects to AWS S3 using environment variables', (done) ->
