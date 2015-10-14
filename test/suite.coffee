@@ -105,9 +105,7 @@ describe 'Upload', ->
 
       upload = new Upload process.env.AWS_BUCKET_NAME
 
-      upload.s3.headBucket upload.opts.aws.params, (err, data) ->
-        assert.ifError err
-        done()
+      upload.s3.headBucket upload.opts.aws.params, done
 
     it 'connects to AWS S3 using constructor options', (done) ->
       @timeout 10000
@@ -116,9 +114,7 @@ describe 'Upload', ->
         accessKeyId: process.env.AWS_ACCESS_KEY_ID
         secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY
 
-      upload.s3.headBucket upload.opts.aws.params, (err, data) ->
-        assert.ifError err
-        done()
+      upload.s3.headBucket upload.opts.aws.params, done
 
   describe '#_getRandomPath()', ->
     it 'returns a new random path', ->
