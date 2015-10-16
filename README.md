@@ -79,12 +79,12 @@ var Upload = require('s3-uploader');
     * **boolean** `flatten` - flatten backgrund for transparent images
     * **string** `awsImageAcl` - access control for AWS S3 upload (**example:** `private`)
     * **number** `awsImageExpires` - add `Expires` header to image version
-    * **number** `awsImageCacheControl` - add `Cache-Control` header to image version
+    * **number** `awsImageMaxAge` - add `Cache-Control: max-age` header to image version
 
   * **object** `original`
     * **string** `awsImageAcl` - access control for AWS S3 upload (**example:** `private`)
     * **number** `awsImageExpires` - add `Expires` header to image version
-    * **number** `awsImageCacheControl` - add `Cache-Control` header to image version
+    * **number** `awsImageMaxAge` - add `Cache-Control: max-age` header to image version
 
   * **function** `randomPath` - custom random path function
 
