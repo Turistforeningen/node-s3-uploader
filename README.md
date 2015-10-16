@@ -117,7 +117,9 @@ var client = new Upload('my_s3_bucket', {
     maxWidth: 1040,
     format: 'jpg',
     suffix: '-large',
-    quality: 80
+    quality: 80,
+    awsImageExpires: 31536000,
+    awsImageMaxAge: 31536000
   },{
     maxWidth: 780,
     aspect: '3:2!h',
