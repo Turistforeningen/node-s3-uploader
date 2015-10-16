@@ -79,12 +79,12 @@ var Upload = require('s3-uploader');
     * **boolean** `flatten` - flatten backgrund for transparent images
     * **string** `awsImageAcl` - access control for AWS S3 upload (**example:** `private`)
     * **number** `awsImageExpires` - add `Expires` header to image version
-    * **number** `awsImageCacheControl` - add `Cache-Control` header to image version
+    * **number** `awsImageMaxAge` - add `Cache-Control: max-age` header to image version
 
   * **object** `original`
     * **string** `awsImageAcl` - access control for AWS S3 upload (**example:** `private`)
     * **number** `awsImageExpires` - add `Expires` header to image version
-    * **number** `awsImageCacheControl` - add `Cache-Control` header to image version
+    * **number** `awsImageMaxAge` - add `Cache-Control: max-age` header to image version
 
   * **function** `randomPath` - custom random path function
 
@@ -117,7 +117,9 @@ var client = new Upload('my_s3_bucket', {
     maxWidth: 1040,
     format: 'jpg',
     suffix: '-large',
-    quality: 80
+    quality: 80,
+    awsImageExpires: 31536000,
+    awsImageMaxAge: 31536000
   },{
     maxWidth: 780,
     aspect: '3:2!h',
