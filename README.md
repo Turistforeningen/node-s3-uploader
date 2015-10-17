@@ -181,7 +181,15 @@ Where A is the original image uploaded by the user. An mpc image is created, B,
 which is used to crate the thumbnails C, D, and E.
 ```
 
-## Maintainers
+## Collaborators
+
+Individuals making significant and valuable contributions are made Collaborators
+and given commit-access to the project. These individuals are identified by the
+existing Collaborators and their addition as Collaborators is discussed as a
+pull request to this project's README.md.
+
+Note: If you make a significant contribution and are not considered for
+commit-access log an issue or contact one of the Collaborators directly.
 
 * Hans Kristian Flaatten (@Starefossen)
 * Anthony Ringoet (@anthonyringoet)
