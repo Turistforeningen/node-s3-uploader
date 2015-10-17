@@ -181,4 +181,9 @@ Where A is the original image uploaded by the user. An mpc image is created, B,
 which is used to crate the thumbnails C, D, and E.
 ```
 
+## Maintainers
+
+* Hans Kristian Flaatten (@Starefossen)
+* Anthony Ringoet (@anthonyringoet)
+
 ## [MIT License](https://github.com/Turistforeningen/node-s3-uploader/blob/master/LICENSE)
