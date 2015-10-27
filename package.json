@@ -47,7 +47,7 @@
     "@starefossen/rand-path": "^1.0.1",
     "async": "~1.4",
     "aws-sdk": "^2.2.9",
-    "im-metadata": "~2.2",
+    "im-metadata": "^3.0.0",
     "im-resize": "~2.3"
   },
   "engines": {
