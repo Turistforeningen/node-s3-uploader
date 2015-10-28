@@ -289,7 +289,7 @@ describe 'Image', ->
         assert.deepEqual metadata,
           path: image.src
           name: ''
-          size: '617KB'
+          size: 631808
           format: 'JPEG'
           colorspace: 'RGB'
           height: 2048
