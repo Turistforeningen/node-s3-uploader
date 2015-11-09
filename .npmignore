@@ -13,9 +13,6 @@ logs
 results
 
 node_modules/
-test_output/
-env/
-src/
 test/
 utils/
 
