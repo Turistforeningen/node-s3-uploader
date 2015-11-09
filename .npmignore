@@ -19,7 +19,6 @@ utils/
 docker-compose.yml
 wercker.yml
 
-.vim.custom
 .gitignore
 .npmignore
 .jshintrc
