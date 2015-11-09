@@ -8,8 +8,8 @@
   },
   "scripts": {
     "hint": "coffeelint src test",
-    "test": "mocha --compilers coffee:coffee-script/register test/suite.coffee",
-    "watch": "mocha -w -b -c --check-leaks -R progress --compilers coffee:coffee-script/register test/suite.coffee"
+    "test": "mocha test",
+    "watch": "mocha -bcw --check-leaks -R progress test"
   },
   "repository": {
     "type": "git",
