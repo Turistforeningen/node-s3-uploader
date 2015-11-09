@@ -7,7 +7,7 @@
     "test": "test"
   },
   "scripts": {
-    "hint": "coffeelint src test",
+    "hint": "jshint index.js test",
     "test": "mocha test",
     "watch": "mocha -bcw --check-leaks -R progress test"
   },
@@ -38,9 +38,9 @@
   },
   "homepage": "https://github.com/Turistforeningen/node-s3-uploader",
   "devDependencies": {
-    "coffeelint": "~1",
     "mocha": "~2",
-    "uuid": "^2"
+    "uuid": "^2",
+    "jshint": "^2.8.0"
   },
   "dependencies": {
     "@starefossen/rand-path": "^1.0.1",

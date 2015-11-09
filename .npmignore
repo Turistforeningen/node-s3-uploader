@@ -22,6 +22,7 @@ wercker.yml
 .vim.custom
 .gitignore
 .npmignore
+.jshintrc
 .DS_Store
 .idea
 *.iml
