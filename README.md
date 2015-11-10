@@ -190,7 +190,9 @@ pull request to this project's README.md.
 Note: If you make a significant contribution and are not considered for
 commit-access log an issue or contact one of the Collaborators directly.
 
-* Hans Kristian Flaatten: [@Starefossen](https://github.com/Starefossen)
-* Anthony Ringoet: [@anthonyringoet](https://github.com/anthonyringoet)
+* Hans Kristian Flaatten: [@Starefossen](https://github.com/Starefossen),
+  [@Starefossen](https://twitter.com/starefossen)
+* Anthony Ringoet: [@anthonyringoet](https://github.com/anthonyringoet),
+  [@anthonyringoet](https://twitter.com/anthonyringoet)
 
 ## [MIT License](https://github.com/Turistforeningen/node-s3-uploader/blob/master/LICENSE)
