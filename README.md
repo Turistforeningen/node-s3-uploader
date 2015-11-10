@@ -8,6 +8,7 @@ AWS S3 Image Uploader
 [![NPM version](https://img.shields.io/npm/v/s3-uploader.svg "NPM version")](https://www.npmjs.com/package/s3-uploader)
 [![Node version](https://img.shields.io/node/v/s3-uploader.svg "Node version")](https://www.npmjs.com/package/s3-uploader)
 [![Dependency status](https://img.shields.io/david/turistforeningen/node-s3-uploader.svg "Dependency status")](https://david-dm.org/turistforeningen/node-s3-uploader)
+[![Join the chat](https://img.shields.io/badge/gitter-join%20chat-blue.svg "Join the chat")](https://gitter.im/Turistforeningen/node-s3-uploader)
 
 Flexible and efficient image resize, rename, and upload to Amazon S3 disk
 storage. Uses the official [AWS Node SDK](http://aws.amazon.com/sdkfornodejs/),
@@ -16,8 +17,6 @@ and [im-resize](https://github.com/Turistforeningen/node-im-resize) and
 processing.
 
 ![Overview of image upload to AWS S3](https://docs.google.com/drawings/d/1EZaE8LaQ6FRSg4R-2QQiT1af-y2AgDknBGrx6SPIKy0/pub?w=766&h=216)
-
-[![Join the chat at https://gitter.im/Turistforeningen/node-s3-uploader](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/Turistforeningen/node-s3-uploader)
 
 ## Changelog
 
