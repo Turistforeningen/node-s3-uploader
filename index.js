@@ -7,7 +7,6 @@ var S3 = require('aws-sdk').S3;
 var auto = require('async').auto;
 var each = require('async').each;
 var map = require('async').map;
-var retry = require('async').retry;
 
 var resize = require('im-resize');
 var metadata = require('im-metadata');
@@ -52,30 +51,10 @@ Upload = module.exports = function(bucketName, opts) {
     ].join('');
   }
 
-  this._randomPath = this.opts.randomPath || require('@starefossen/rand-path');
+  this._randomPath = this.opts.randomPath || require('node-uuid');
   this.s3 = new S3(this.opts.aws);
 
   return this;
-};
-
-Upload.prototype._getDestPath = function(prefix, callback) {
-  var $this = this;
-
-  retry(5, function(cb) {
-    var path = prefix + $this._randomPath();
-
-    $this.s3.listObjects({
-      Prefix: path
-    }, function(err, data) {
-      if (err) {
-        return cb(err);
-      }
-      if (data.Contents.length === 0) {
-        return cb(null, path);
-      }
-      return cb(new Error('Path ' + path + ' not avaiable'));
-    });
-  }, callback);
 };
 
 Upload.prototype.upload = function(src, opts, cb) {
@@ -113,15 +92,11 @@ Image.prototype.getMetadata = function(src, cb) {
 
 Image.prototype.getDest = function(cb) {
   var prefix = this.opts.awsPath || this.upload.opts.aws.path;
-  var $this = this;
+  var path = this.opts.path || this.upload._randomPath();
 
-  if (this.opts.path) {
-    return process.nextTick(function() {
-      cb(null, prefix + $this.opts.path);
-    });
-  }
-
-  return this.upload._getDestPath(prefix, cb);
+  process.nextTick(function() {
+    cb(null, prefix + path);
+  });
 };
 
 Image.prototype.resizeVersions = function(cb, results) {
