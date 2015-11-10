@@ -12,7 +12,9 @@ var retry = require('async').retry;
 var resize = require('im-resize');
 var metadata = require('im-metadata');
 
-var Upload = module.exports = function(bucketName, opts) {
+var Upload, Image;
+
+Upload = module.exports = function(bucketName, opts) {
   this.opts = opts || {};
 
   if (!bucketName) {
@@ -82,7 +84,7 @@ Upload.prototype.upload = function(src, opts, cb) {
   image.start(cb);
 };
 
-var Image = module.exports.Image = function(src, opts, upload) {
+Image = module.exports.Image = function(src, opts, upload) {
   this.src = src;
   this.opts = opts;
   this.upload = upload;
