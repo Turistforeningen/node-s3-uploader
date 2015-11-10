@@ -605,9 +605,9 @@ describe('Integration Tests', function() {
   });
   it('uploads image to new random path', function(done) {
     this.timeout(10000);
-    upload.upload(__dirname + '/assets/portrait.jpg', {}, function(err, images) {
+    upload.upload(__dirname + '/assets/portrait.jpg', {}, function(e, images) {
       var image, j, len;
-      assert.ifError(err);
+      assert.ifError(e);
       for (j = 0, len = images.length; j < len; j++) {
         image = images[j];
         if (image.key) {

@@ -50,7 +50,7 @@ var Upload = module.exports = function(bucketName, opts) {
     ].join('');
   }
 
-  this._getRandomPath = this.opts.randomPath || require('@starefossen/rand-path');
+  this._randomPath = this.opts.randomPath || require('@starefossen/rand-path');
   this.s3 = new S3(this.opts.aws);
 
   return this;
@@ -60,7 +60,7 @@ Upload.prototype._getDestPath = function(prefix, callback) {
   var $this = this;
 
   retry(5, function(cb) {
-    var path = prefix + $this._getRandomPath();
+    var path = prefix + $this._randomPath();
 
     $this.s3.listObjects({
       Prefix: path
