@@ -13,18 +13,15 @@ logs
 results
 
 node_modules/
-test_output/
-env/
-src/
 test/
 utils/
 
 docker-compose.yml
 wercker.yml
 
-.vim.custom
 .gitignore
 .npmignore
+.jshintrc
 .DS_Store
 .idea
 *.iml

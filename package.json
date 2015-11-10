@@ -7,12 +7,9 @@
     "test": "test"
   },
   "scripts": {
-    "build": "coffee -c -b -o lib/ src/*.coffee",
-    "prepublish": "coffee -c -b -o lib/ src/*.coffee",
-    "postpublish": "rm -rf lib/*",
-    "hint": "coffeelint src test",
-    "test": "mocha --compilers coffee:coffee-script/register test/suite.coffee",
-    "watch": "mocha -w -b -c --check-leaks -R progress --compilers coffee:coffee-script/register test/suite.coffee"
+    "hint": "jshint index.js test",
+    "test": "mocha test",
+    "watch": "mocha -bcw --check-leaks -R progress test"
   },
   "repository": {
     "type": "git",
@@ -41,10 +38,9 @@
   },
   "homepage": "https://github.com/Turistforeningen/node-s3-uploader",
   "devDependencies": {
-    "coffee-script": "~1",
-    "coffeelint": "~1",
     "mocha": "~2",
-    "uuid": "^2"
+    "uuid": "^2",
+    "jshint": "^2.8.0"
   },
   "dependencies": {
     "@starefossen/rand-path": "^1.0.1",
