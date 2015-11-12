@@ -162,7 +162,7 @@ client.upload('/some/image.jpg', {}, function(err, versions, meta) {
 
   versions.forEach(function(image) {
     console.log(image.width, image.height, image.url);
-    // 1234 4567 https://my-bucket.s3.amazonaws.com/path/ab/cd/ef.jpg
+    // 1024 760 https://my-bucket.s3.amazonaws.com/path/110ec58a-a0f2-4ac4-8393-c866d813b8d1.jpg
   });
 });
 ```

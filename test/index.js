@@ -158,82 +158,16 @@ describe('Upload', function() {
   describe('#_randomPath()', function() {
     it('returns a new random path', function() {
       var path = upload._randomPath();
-      assert(/^\w{2}(\/\w{2}){2}$/.test(path));
+      assert(/^\w+(-\w+){4}$/.test(path));
     });
 
     it('returns custom random path', function() {
       var upload = new Upload(process.env.AWS_BUCKET_NAME, {
-        randomPath: require('uuid').v1
+        randomPath: require('@starefossen/rand-path')
       });
 
       var path = upload._randomPath();
-      assert(/^\w+(-\w+){4}$/.test(path));
-    });
-  });
-
-  describe('#_getDestPath()', function() {
-    beforeEach(function() {
-      upload._randomPath = function() {
-        return 'aa/bb/cc';
-      };
-    });
-
-    it('returns a random avaiable path', function(done) {
-      upload.s3.listObjects = function(opts, cb) {
-        process.nextTick(function() {
-          cb(null, {
-            Contents: []
-          });
-        });
-      };
-
-      upload._getDestPath('some/prefix/', function(err, path) {
-        assert.ifError(err);
-        assert.equal(path, 'some/prefix/aa/bb/cc');
-        done();
-      });
-    });
-
-    it('returns error if no available path can be found', function(done) {
-      upload.s3.listObjects = function(opts, cb) {
-        process.nextTick(function() {
-          cb(null, {
-            Contents: [opts.Prefix]
-          });
-        });
-      };
-
-      upload._getDestPath('some/prefix/', function(err) {
-        assert(err instanceof Error);
-        assert.equal(err.message, 'Path some/prefix/aa/bb/cc not avaiable');
-        done();
-      });
-    });
-
-    it('retries five 5 times to find an avaiable path', function(done) {
-      var count = 0;
-
-      upload.s3.listObjects = function(opts, cb) {
-        if (++count < 5) {
-          return process.nextTick(function() {
-            cb(null, {
-              Contents: [opts.Prefix]
-            });
-          });
-        }
-
-        process.nextTick(function() {
-          cb(null, {
-            Contents: []
-          });
-        });
-      };
-
-      upload._getDestPath('some/prefix/', function(err, path) {
-        assert.ifError(err);
-        assert.equal(path, 'some/prefix/aa/bb/cc');
-        done();
-      });
+      assert(/^\w{2}(\/\w{2}){2}$/.test(path));
     });
   });
 });
@@ -244,7 +178,7 @@ describe('Image', function() {
   beforeEach(function() {
     image = new Upload.Image(__dirname + '/assets/photo.jpg', {}, upload);
     image.upload._randomPath = function() {
-      return 'aa/bb/cc';
+      return '110ec58a-a0f2-4ac4-8393-c866d813b8d1';
     };
   });
 
@@ -274,11 +208,11 @@ describe('Image', function() {
       };
 
       image.upload.s3.putObject = function(opts) {
-        assert.equal(opts.Key, 'aa/bb/cc.jpg');
+        assert.equal(opts.Key, '110ec58a-a0f2-4ac4-8393-c866d813b8d1.jpg');
         done();
       };
 
-      image._upload('aa/bb/cc', version);
+      image._upload('110ec58a-a0f2-4ac4-8393-c866d813b8d1', version);
     });
 
     it('sets upload key suffix', function(done) {
@@ -288,11 +222,12 @@ describe('Image', function() {
       };
 
       image.upload.s3.putObject = function(opts) {
-        assert.equal(opts.Key, 'aa/bb/cc-small.jpg');
+        var dest = '110ec58a-a0f2-4ac4-8393-c866d813b8d1-small.jpg';
+        assert.equal(opts.Key, dest);
         done();
       };
 
-      image._upload('aa/bb/cc', version);
+      image._upload('110ec58a-a0f2-4ac4-8393-c866d813b8d1', version);
     });
 
     it('sets upload key format', function(done) {
@@ -301,11 +236,11 @@ describe('Image', function() {
       };
 
       image.upload.s3.putObject = function(opts) {
-        assert.equal(opts.Key, 'aa/bb/cc.png');
+        assert.equal(opts.Key, '110ec58a-a0f2-4ac4-8393-c866d813b8d1.png');
         done();
       };
 
-      image._upload('aa/bb/cc', version);
+      image._upload('110ec58a-a0f2-4ac4-8393-c866d813b8d1', version);
     });
 
     it('sets default ACL', function(done) {
@@ -318,7 +253,7 @@ describe('Image', function() {
         done();
       };
 
-      image._upload('aa/bb/cc', version);
+      image._upload('110ec58a-a0f2-4ac4-8393-c866d813b8d1', version);
     });
 
     it('sets specific ACL', function(done) {
@@ -332,7 +267,7 @@ describe('Image', function() {
         done();
       };
 
-      image._upload('aa/bb/cc', version);
+      image._upload('110ec58a-a0f2-4ac4-8393-c866d813b8d1', version);
     });
 
     it('sets upload body', function(done) {
@@ -346,7 +281,7 @@ describe('Image', function() {
         done();
       };
 
-      image._upload('aa/bb/cc', version);
+      image._upload('110ec58a-a0f2-4ac4-8393-c866d813b8d1', version);
     });
 
     it('sets upload content type for png', function(done) {
@@ -359,7 +294,7 @@ describe('Image', function() {
         done();
       };
 
-      image._upload('aa/bb/cc', version);
+      image._upload('110ec58a-a0f2-4ac4-8393-c866d813b8d1', version);
     });
 
     it('sets upload content type for jpg', function(done) {
@@ -372,7 +307,7 @@ describe('Image', function() {
         done();
       };
 
-      image._upload('aa/bb/cc', version);
+      image._upload('110ec58a-a0f2-4ac4-8393-c866d813b8d1', version);
     });
 
     it('sets upload expire header for version', function(done) {
@@ -386,7 +321,7 @@ describe('Image', function() {
         done();
       };
 
-      image._upload('aa/bb/cc', version);
+      image._upload('110ec58a-a0f2-4ac4-8393-c866d813b8d1', version);
     });
 
     it('sets upload cache-control header for version', function(done) {
@@ -400,7 +335,7 @@ describe('Image', function() {
         done();
       };
 
-      image._upload('aa/bb/cc', version);
+      image._upload('110ec58a-a0f2-4ac4-8393-c866d813b8d1', version);
     });
 
     it('returns etag for uploaded version', function(done) {
@@ -408,7 +343,8 @@ describe('Image', function() {
         path: '/some/image.jpg'
       };
 
-      image._upload('aa/bb/cc', version, function(err, version) {
+      var dest = '110ec58a-a0f2-4ac4-8393-c866d813b8d1';
+      image._upload(dest, version, function(err, version) {
         assert.ifError(err);
         assert.equal(version.etag, '"f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1"');
         done();
@@ -420,9 +356,10 @@ describe('Image', function() {
         path: '/some/image.jpg'
       };
 
-      image._upload('aa/bb/cc', version, function(err, version) {
+      var dest = '110ec58a-a0f2-4ac4-8393-c866d813b8d1';
+      image._upload(dest, version, function(err, version) {
         assert.ifError(err);
-        assert.equal(version.url, image.upload.opts.url + 'aa/bb/cc.jpg');
+        assert.equal(version.url, image.upload.opts.url + dest + '.jpg');
         done();
       });
     });
@@ -460,9 +397,11 @@ describe('Image', function() {
 
   describe('#getDest()', function() {
     it('returns destination path', function(done) {
+      var dest = '110ec58a-a0f2-4ac4-8393-c866d813b8d1';
+
       image.getDest(function(err, path) {
         assert.ifError(err);
-        assert.equal(path, image.upload.opts.aws.path + 'aa/bb/cc');
+        assert.equal(path, image.upload.opts.aws.path + dest);
         done();
       });
     });
@@ -471,7 +410,7 @@ describe('Image', function() {
       image.opts.awsPath = 'custom/path/';
       image.getDest(function(err, path) {
         assert.ifError(err);
-        assert.equal(path, 'custom/path/aa/bb/cc');
+        assert.equal(path, 'custom/path/110ec58a-a0f2-4ac4-8393-c866d813b8d1');
         done();
       });
     });
@@ -653,7 +592,7 @@ describe('Integration Tests', function() {
   beforeEach(function() {
     if (process.env.INTEGRATION_TEST !== 'true') {
       upload._randomPath = function() {
-        return 'aa/bb/cc';
+        return '110ec58a-a0f2-4ac4-8393-c866d813b8d1';
       };
     }
   });
