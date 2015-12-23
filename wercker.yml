@@ -1,4 +1,4 @@
-box: starefossen/iojs-imagemagick:1.0-6.8
+box: starefossen/node-imagemagick:4-6
 
 build:
   steps:
