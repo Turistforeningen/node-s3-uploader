@@ -40,7 +40,7 @@ Upload = module.exports = (bucketName, @opts = {}) ->
     @opts.url ?= "https://s3.amazonaws.com/#{bucketName}/"
   else if not @opts.url
     @opts.url ?= "https://s3-#{@opts.aws.region}.amazonaws.com/#{bucketName}/"
-
+  @opts.override                ?= false
   @._getRandomPath = @opts.randomPath or require('@starefossen/rand-path')
 
   @s3 = new S3 @opts.aws
@@ -53,10 +53,13 @@ Upload = module.exports = (bucketName, @opts = {}) ->
 Upload.prototype._getDestPath = (prefix, callback) ->
   retry 5, (cb) =>
     path = prefix + @_getRandomPath()
-    @s3.listObjects Prefix: path, (err, data) ->
+    @s3.listObjects Prefix: path, (err, data) =>
       return cb err if err
       return cb null, path if data.Contents.length is 0
-      return cb new Error "Path #{path} not avaiable"
+      if @opts.override
+        return cb(null, path)
+      else
+        return cb new Error "Path #{path} not avaiable"
   , callback
 
 ##
