@@ -38,16 +38,16 @@
   },
   "homepage": "https://github.com/Turistforeningen/node-s3-uploader",
   "devDependencies": {
-    "@starefossen/rand-path": "^1",
-    "mocha": "~2",
-    "jshint": "^2.8.0"
+    "@starefossen/rand-path": "^2.0.0",
+    "jshint": "^2.9.2",
+    "mocha": "^2.5.3"
   },
   "dependencies": {
-    "async": "~1.4",
-    "aws-sdk": "^2.2.9",
+    "async": "^1.5.2",
+    "aws-sdk": "^2.4.1",
     "im-metadata": "^3.0.0",
-    "im-resize": "~2.3.1",
-    "node-uuid": "^1.4.3"
+    "im-resize": "^2.3.1",
+    "node-uuid": "^1.4.7"
   },
   "engines": {
     "node": ">=0.10",
