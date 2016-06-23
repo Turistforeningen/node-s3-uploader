@@ -8,22 +8,51 @@ build:
           echo "node version $(node -v) running"
           echo "npm version $(npm -v) running"
 
-    - script:
-        name: echo imagemagick information
-        code: echo "$(convert -version)"
-
     - npm-install
 
     - script:
-        name: jshint
-        code: npm run hint
+        name: lint
+        code: npm run lint
 
     - npm-test
+
+    - script:
+        name: test coverage
+        code: |
+          npm run cover
+          cat ./coverage/lcov.info | npm run codacy-coverage
+
+    - script:
+        name: node security project
+        code: |
+          npm run nsp
 
   after-steps:
     - turistforeningen/slack-notifier:
         url: $SLACK_WEBHOOK_URL
 
-deploy:
+npm:
   steps:
+    # Rebuild node_modules to fix broken symlinks
+    # https://github.com/wercker/docs/issues/310
+    - script:
+        name: npm rebuild
+        code: npm rebuild
+
+    - script:
+        name: semantic release pre
+        code: npm run semantic-release -- pre
+
     - turistforeningen/npm-publish
+
+    - script:
+        name: semantic release post
+        code: npm run semantic-release -- post
+
+    - script:
+        name: greenkeeper postpublish
+        code: npm run greenkeeper-postpublish
+
+  after-steps:
+    - turistforeningen/slack-notifier:
+        url: $SLACK_WEBHOOK_URL
