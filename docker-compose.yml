@@ -1,12 +1,15 @@
-dev:
-  image: starefossen/node-imagemagick:4-6
-  working_dir: /usr/src/app
-  volumes:
-    - ".:/usr/src/app"
-  command: "npm run watch"
-  env_file: .env
-  environment:
-    - NODE_ENV=development
-    - NPM_CONFIG_LOGLEVEL=info
-    - NPM_PACKAGE_CONFIG_UNSAFE_PERM=true
-    - NPM_CONFIG_UNSAFE_PERM=true
+version: '2'
+
+services:
+  node:
+    image: starefossen/node-imagemagick:4-6
+    working_dir: /usr/src/app
+    volumes:
+      - ".:/usr/src/app"
+    env_file: .env
+    environment:
+      - NODE_ENV=development
+      - NPM_CONFIG_LOGLEVEL=silent
+      - NPM_CONFIG_PROGRESS=false
+      - NPM_CONFIG_SPIN=false
+    command: npm test

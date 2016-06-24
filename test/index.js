@@ -1,25 +1,33 @@
 'use strict';
 
-var assert = require('assert');
-var Upload = require('../.');
+const assert = require('assert');
+const Upload = require('../.');
 
-var upload = null;
-var cleanup = [];
+const fs = require('fs');
+const S3 = require('aws-sdk').S3;
+const ReadStream = require('fs').ReadStream;
+const statSync = require('fs').statSync;
+const unlinkSync = require('fs').unlinkSync;
 
-beforeEach(function() {
+const randomPath = require('@starefossen/rand-path');
+
+let upload;
+let cleanup = [];
+
+beforeEach(() => {
   upload = new Upload(process.env.AWS_BUCKET_NAME, {
     aws: {
       path: process.env.AWS_BUCKET_PATH,
       region: process.env.AWS_BUCKET_REGION,
-      acl: 'public-read'
+      acl: 'public-read',
     },
     cleanup: {
       versions: true,
-      original: false
+      original: false,
     },
     original: {
       awsImageAcl: 'private',
-      awsImageMaxAge: 31536000
+      awsImageMaxAge: 31536000,
     },
     versions: [
       {
@@ -27,187 +35,180 @@ beforeEach(function() {
         maxWidth: 1040,
         format: 'jpg',
         suffix: '-large',
-        quality: 80
+        quality: 80,
       }, {
         maxWidth: 780,
         aspect: '3:2!h',
-        suffix: '-medium'
+        suffix: '-medium',
       }, {
         maxWidth: 320,
         aspect: '16:9!h',
-        suffix: '-small'
+        suffix: '-small',
       }, {
         maxHeight: 100,
         aspect: '1:1',
         format: 'png',
         suffix: '-thumb1',
         awsImageExpires: 31536000,
-        cacheControl: 31536000
+        cacheControl: 31536000,
       }, {
         maxHeight: 250,
         maxWidth: 250,
         aspect: '1:1',
         suffix: '-thumb2',
         awsImageExpires: 31536000,
-        cacheControl: 31536000
-      }
-    ]
+        cacheControl: 31536000,
+      },
+    ],
   });
   if (process.env.INTEGRATION_TEST !== 'true') {
-    upload.s3.listObjects = function(path, cb) {
-      process.nextTick(function() {
-        cb(null, {
-          Contents: []
-        });
+    upload.s3.listObjects = (path, cb) => {
+      process.nextTick(() => {
+        cb(null, { Contents: [] });
       });
     };
-    upload.s3.putObject = function(opts, cb) {
-      process.nextTick(function() {
-        cb(null, {
-          ETag: '"f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1"'
-        });
+    upload.s3.putObject = (opts, cb) => {
+      process.nextTick(() => {
+        cb(null, { ETag: '"f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1"' });
       });
     };
   }
 });
 
 if (process.env.INTEGRATION_TEST === 'true') {
-  afterEach(function(done) {
+  afterEach(function afterEach(done) {
     this.timeout(40000);
+
     if (cleanup.length === 0) {
       return process.nextTick(done);
     }
-    upload.s3.deleteObjects({
+
+    return upload.s3.deleteObjects({
       Delete: {
-        Objects: cleanup
-      }
-    }, function(err) {
-      if (err) {
-        throw err;
-      }
+        Objects: cleanup,
+      },
+    }, (err) => {
+      if (err) { throw err; }
       cleanup = [];
       done();
     });
   });
 }
 
-describe('Upload', function() {
-  describe('constructor', function() {
-    it('throws error for missing awsBucketName param', function() {
-      assert.throws(function() {
-        new Upload();
+describe('Upload', () => {
+  describe('constructor', () => {
+    it('throws error for missing awsBucketName param', () => {
+      assert.throws(() => {
+        const client = new Upload();
+        assert.equal(client, null);
       }, /Bucket name can not be undefined/);
     });
-    it('sets default values if not provided', function() {
+
+    it('sets default values if not provided', () => {
       upload = new Upload('myBucket');
-      assert(upload.s3 instanceof require('aws-sdk').S3);
+      assert(upload.s3 instanceof S3);
       assert.deepEqual(upload.opts, {
         aws: {
           acl: 'private',
           httpOptions: {
-            timeout: 10000
+            timeout: 10000,
           },
           maxRetries: 3,
           params: {
-            Bucket: 'myBucket'
+            Bucket: 'myBucket',
           },
           path: '',
           region: 'us-east-1',
-          sslEnabled: true
+          sslEnabled: true,
         },
         cleanup: {},
         returnExif: false,
         resize: {
-          quality: 70
+          quality: 70,
         },
         versions: [],
-        url: 'https://s3.amazonaws.com/myBucket/'
+        url: 'https://s3.amazonaws.com/myBucket/',
       });
     });
-    it('sets default url based on AWS region', function() {
+    it('sets default url based on AWS region', () => {
       upload = new Upload('b', {
         aws: {
-          region: 'my-region-1'
-        }
+          region: 'my-region-1',
+        },
       });
       assert.equal(upload.opts.url, 'https://s3-my-region-1.amazonaws.com/b/');
     });
-    it('sets custom url', function() {
+
+    it('sets custom url', () => {
       upload = new Upload('b', {
-        url: 'http://cdn.app.com/'
+        url: 'http://cdn.app.com/',
       });
       assert.equal(upload.opts.url, 'http://cdn.app.com/');
     });
-    it('connects to AWS S3 using environment variables', function(done) {
+
+    it('connects to AWS S3 using environment constiables', function it(done) {
       this.timeout(10000);
       upload = new Upload(process.env.AWS_BUCKET_NAME);
       upload.s3.headBucket(upload.opts.aws.params, done);
     });
-    it('connects to AWS S3 using constructor options', function(done) {
+
+    it('connects to AWS S3 using constructor options', function it(done) {
       this.timeout(10000);
       upload = new Upload(process.env.AWS_BUCKET_NAME, {
         aws: {
           accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-          secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY
-        }
+          secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+        },
       });
       upload.s3.headBucket(upload.opts.aws.params, done);
     });
   });
 
-  describe('#_randomPath()', function() {
-    it('returns a new random path', function() {
-      var path = upload._randomPath();
+  describe('#_randomPath()', () => {
+    it('returns a new random path', () => {
+      const path = upload._randomPath();
       assert(/^\w+(-\w+){4}$/.test(path));
     });
 
-    it('returns custom random path', function() {
-      var upload = new Upload(process.env.AWS_BUCKET_NAME, {
-        randomPath: require('@starefossen/rand-path')
-      });
+    it('returns custom random path', () => {
+      upload = new Upload(process.env.AWS_BUCKET_NAME, { randomPath });
 
-      var path = upload._randomPath();
+      const path = upload._randomPath();
       assert(/^\w{2}(\/\w{2}){2}$/.test(path));
     });
   });
 });
 
-describe('Image', function() {
-  var image;
+describe('Image', () => {
+  let image;
 
-  beforeEach(function() {
-    image = new Upload.Image(__dirname + '/assets/photo.jpg', {}, upload);
-    image.upload._randomPath = function() {
-      return '110ec58a-a0f2-4ac4-8393-c866d813b8d1';
-    };
+  beforeEach(() => {
+    image = new Upload.Image(`${__dirname}/assets/photo.jpg`, {}, upload);
+    image.upload._randomPath = () => '110ec58a-a0f2-4ac4-8393-c866d813b8d1';
   });
 
-  describe('constructor', function() {
-    it('sets default values', function() {
+  describe('constructor', () => {
+    it('sets default values', () => {
       assert(image instanceof Upload.Image);
-      assert.equal(image.src, __dirname + '/assets/photo.jpg');
+      assert.equal(image.src, `${__dirname}/assets/photo.jpg`);
       assert.deepEqual(image.opts, {});
       assert(image.upload instanceof Upload);
     });
   });
 
-  describe('#_upload()', function() {
-    beforeEach(function() {
-      image.upload.s3.putObject = function(opts, cb) {
-        process.nextTick(function() {
-          cb(null, {
-            ETag: '"f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1"'
-          });
+  describe('#_upload()', () => {
+    beforeEach(() => {
+      image.upload.s3.putObject = (opts, cb) => {
+        process.nextTick(() => {
+          cb(null, { ETag: '"f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1"' });
         });
       };
     });
 
-    it('sets upload key', function(done) {
-      var version = {
-        path: '/some/image.jpg'
-      };
+    it('sets upload key', done => {
+      const version = { path: '/some/image.jpg' };
 
-      image.upload.s3.putObject = function(opts) {
+      image.upload.s3.putObject = (opts) => {
         assert.equal(opts.Key, '110ec58a-a0f2-4ac4-8393-c866d813b8d1.jpg');
         done();
       };
@@ -215,14 +216,14 @@ describe('Image', function() {
       image._upload('110ec58a-a0f2-4ac4-8393-c866d813b8d1', version);
     });
 
-    it('sets upload key suffix', function(done) {
-      var version = {
+    it('sets upload key suffix', done => {
+      const version = {
         path: '/some/image.jpg',
-        suffix: '-small'
+        suffix: '-small',
       };
 
-      image.upload.s3.putObject = function(opts) {
-        var dest = '110ec58a-a0f2-4ac4-8393-c866d813b8d1-small.jpg';
+      image.upload.s3.putObject = (opts) => {
+        const dest = '110ec58a-a0f2-4ac4-8393-c866d813b8d1-small.jpg';
         assert.equal(opts.Key, dest);
         done();
       };
@@ -230,12 +231,12 @@ describe('Image', function() {
       image._upload('110ec58a-a0f2-4ac4-8393-c866d813b8d1', version);
     });
 
-    it('sets upload key format', function(done) {
-      var version = {
-        path: '/some/image.png'
+    it('sets upload key format', done => {
+      const version = {
+        path: '/some/image.png',
       };
 
-      image.upload.s3.putObject = function(opts) {
+      image.upload.s3.putObject = (opts) => {
         assert.equal(opts.Key, '110ec58a-a0f2-4ac4-8393-c866d813b8d1.png');
         done();
       };
@@ -243,12 +244,12 @@ describe('Image', function() {
       image._upload('110ec58a-a0f2-4ac4-8393-c866d813b8d1', version);
     });
 
-    it('sets default ACL', function(done) {
-      var version = {
-        path: '/some/image.png'
+    it('sets default ACL', done => {
+      const version = {
+        path: '/some/image.png',
       };
 
-      image.upload.s3.putObject = function(opts) {
+      image.upload.s3.putObject = (opts) => {
         assert.equal(opts.ACL, upload.opts.aws.acl);
         done();
       };
@@ -256,13 +257,13 @@ describe('Image', function() {
       image._upload('110ec58a-a0f2-4ac4-8393-c866d813b8d1', version);
     });
 
-    it('sets specific ACL', function(done) {
-      var version = {
+    it('sets specific ACL', done => {
+      const version = {
         path: '/some/image.png',
-        awsImageAcl: 'private'
+        awsImageAcl: 'private',
       };
 
-      image.upload.s3.putObject = function(opts) {
+      image.upload.s3.putObject = (opts) => {
         assert.equal(opts.ACL, version.awsImageAcl);
         done();
       };
@@ -270,13 +271,13 @@ describe('Image', function() {
       image._upload('110ec58a-a0f2-4ac4-8393-c866d813b8d1', version);
     });
 
-    it('sets upload body', function(done) {
-      var version = {
-        path: '/some/image.png'
+    it('sets upload body', done => {
+      const version = {
+        path: '/some/image.png',
       };
 
-      image.upload.s3.putObject = function(opts) {
-        assert(opts.Body instanceof require('fs').ReadStream);
+      image.upload.s3.putObject = (opts) => {
+        assert(opts.Body instanceof ReadStream);
         assert.equal(opts.Body.path, version.path);
         done();
       };
@@ -284,12 +285,12 @@ describe('Image', function() {
       image._upload('110ec58a-a0f2-4ac4-8393-c866d813b8d1', version);
     });
 
-    it('sets upload content type for png', function(done) {
-      var version = {
-        path: '/some/image.png'
+    it('sets upload content type for png', done => {
+      const version = {
+        path: '/some/image.png',
       };
 
-      image.upload.s3.putObject = function(opts) {
+      image.upload.s3.putObject = (opts) => {
         assert.equal(opts.ContentType, 'image/png');
         done();
       };
@@ -297,12 +298,12 @@ describe('Image', function() {
       image._upload('110ec58a-a0f2-4ac4-8393-c866d813b8d1', version);
     });
 
-    it('sets upload content type for jpg', function(done) {
-      var version = {
-        path: '/some/image.jpg'
+    it('sets upload content type for jpg', done => {
+      const version = {
+        path: '/some/image.jpg',
       };
 
-      image.upload.s3.putObject = function(opts) {
+      image.upload.s3.putObject = (opts) => {
         assert.equal(opts.ContentType, 'image/jpeg');
         done();
       };
@@ -310,13 +311,13 @@ describe('Image', function() {
       image._upload('110ec58a-a0f2-4ac4-8393-c866d813b8d1', version);
     });
 
-    it('sets upload expire header for version', function(done) {
-      var version = {
+    it('sets upload expire header for version', done => {
+      const version = {
         path: '/some/image.jpg',
-        awsImageExpires: 1234
+        awsImageExpires: 1234,
       };
 
-      image.upload.s3.putObject = function(opts) {
+      image.upload.s3.putObject = (opts) => {
         assert(opts.Expires - Date.now() <= 1234);
         done();
       };
@@ -324,13 +325,13 @@ describe('Image', function() {
       image._upload('110ec58a-a0f2-4ac4-8393-c866d813b8d1', version);
     });
 
-    it('sets upload cache-control header for version', function(done) {
-      var version = {
+    it('sets upload cache-control header for version', done => {
+      const version = {
         path: '/some/image.jpg',
-        awsImageMaxAge: 1234
+        awsImageMaxAge: 1234,
       };
 
-      image.upload.s3.putObject = function(opts) {
+      image.upload.s3.putObject = (opts) => {
         assert.equal(opts.CacheControl, 'public, max-age=1234');
         done();
       };
@@ -338,37 +339,37 @@ describe('Image', function() {
       image._upload('110ec58a-a0f2-4ac4-8393-c866d813b8d1', version);
     });
 
-    it('returns etag for uploaded version', function(done) {
-      var version = {
-        path: '/some/image.jpg'
+    it('returns etag for uploaded version', done => {
+      const version1 = {
+        path: '/some/image.jpg',
       };
 
-      var dest = '110ec58a-a0f2-4ac4-8393-c866d813b8d1';
-      image._upload(dest, version, function(err, version) {
+      const dest = '110ec58a-a0f2-4ac4-8393-c866d813b8d1';
+      image._upload(dest, version1, (err, version2) => {
         assert.ifError(err);
-        assert.equal(version.etag, '"f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1"');
+        assert.equal(version2.etag, '"f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1f1"');
         done();
       });
     });
 
-    it('returns url for uploaded version', function(done) {
-      var version = {
-        path: '/some/image.jpg'
+    it('returns url for uploaded version', done => {
+      const version1 = {
+        path: '/some/image.jpg',
       };
 
-      var dest = '110ec58a-a0f2-4ac4-8393-c866d813b8d1';
-      image._upload(dest, version, function(err, version) {
+      const dest = '110ec58a-a0f2-4ac4-8393-c866d813b8d1';
+      image._upload(dest, version1, (err, version2) => {
         assert.ifError(err);
-        assert.equal(version.url, image.upload.opts.url + dest + '.jpg');
+        assert.equal(version2.url, `${image.upload.opts.url}${dest}.jpg`);
         done();
       });
     });
   });
 
-  describe('#getMetadata()', function() {
-    it('returns image metadata without exif data', function(done) {
+  describe('#getMetadata()', () => {
+    it('returns image metadata without exif data', done => {
       image.upload.opts.returnExif = false;
-      image.getMetadata(image.src, function(err, metadata) {
+      image.getMetadata(image.src, (err, metadata) => {
         assert.ifError(err);
         assert.deepEqual(metadata, {
           path: image.src,
@@ -378,15 +379,15 @@ describe('Image', function() {
           colorspace: 'RGB',
           height: 2048,
           width: 1536,
-          orientation: ''
+          orientation: '',
         });
         done();
       });
     });
 
-    it('returns image metadata with exif data', function(done) {
+    it('returns image metadata with exif data', done => {
       image.upload.opts.returnExif = true;
-      image.getMetadata(image.src, function(err, metadata) {
+      image.getMetadata(image.src, (err, metadata) => {
         assert.ifError(err);
         assert.equal(Object.keys(metadata).length, 9);
         assert.equal(metadata.exif.GPSInfo, '954');
@@ -395,39 +396,39 @@ describe('Image', function() {
     });
   });
 
-  describe('#getDest()', function() {
-    it('returns destination path', function(done) {
-      var dest = '110ec58a-a0f2-4ac4-8393-c866d813b8d1';
+  describe('#getDest()', () => {
+    it('returns destination path', done => {
+      const dest = '110ec58a-a0f2-4ac4-8393-c866d813b8d1';
 
-      image.getDest(function(err, path) {
+      image.getDest((err, path) => {
         assert.ifError(err);
         assert.equal(path, image.upload.opts.aws.path + dest);
         done();
       });
     });
 
-    it('overrides destination path prefix', function(done) {
+    it('overrides destination path prefix', done => {
       image.opts.awsPath = 'custom/path/';
-      image.getDest(function(err, path) {
+      image.getDest((err, path) => {
         assert.ifError(err);
         assert.equal(path, 'custom/path/110ec58a-a0f2-4ac4-8393-c866d813b8d1');
         done();
       });
     });
 
-    it('returns fixed upload path', function(done) {
+    it('returns fixed upload path', done => {
       image.opts.path = 'my/image';
-      image.getDest(function(err, path) {
+      image.getDest((err, path) => {
         assert.ifError(err);
         assert.equal(path, 'images_test/my/image');
         done();
       });
     });
 
-    it('returns fixed upload path with custom prefix', function(done) {
+    it('returns fixed upload path with custom prefix', done => {
       image.opts.awsPath = 'custom/path/';
       image.opts.path = 'my/image';
-      image.getDest(function(err, path) {
+      image.getDest((err, path) => {
         assert.ifError(err);
         assert.equal(path, 'custom/path/my/image');
         done();
@@ -435,34 +436,30 @@ describe('Image', function() {
     });
   });
 
-  describe('#resizeVersions()', function() {
-    it('resizes image versions', function(done) {
-      image.getMetadata(image.src, function(err, metadata) {
-        assert.ifError(err);
+  describe('#resizeVersions()', () => {
+    it('resizes image versions', done => {
+      image.getMetadata(image.src, (err1, metadata) => {
+        assert.ifError(err1);
 
-        image.resizeVersions(function(err, versions) {
-          assert.ifError(err);
+        image.resizeVersions((err2, versions) => {
+          assert.ifError(err2);
 
-          var version;
-          for (var i = 0; i < versions.length; i++) {
-            version = versions[i];
-            require('fs').statSync(version.path);
-            require('fs').unlinkSync(version.path);
-          }
+          versions.forEach(version => {
+            statSync(version.path);
+            unlinkSync(version.path);
+          });
 
           done();
-        }, {
-          metadata: metadata
-        });
+        }, { metadata });
       });
     });
   });
 
-  describe('#uploadVersions()', function() {
-    it('uploads image versions', function(done) {
-      var i = 0;
+  describe('#uploadVersions()', () => {
+    it('uploads image versions', done => {
+      let i = 0;
 
-      image._upload = function(dest, version, cb) {
+      image._upload = (dest, version, cb) => {
         assert.equal(dest, '/foo/bar');
         assert.equal(version, i++);
         cb(null, version + 1);
@@ -470,18 +467,18 @@ describe('Image', function() {
 
       image.upload.opts.original = undefined;
 
-      image.uploadVersions(function(err, versions) {
+      image.uploadVersions((err, versions) => {
         assert.ifError(err);
         assert.deepEqual(versions, [1, 2, 3, 4]);
         done();
       }, {
         versions: [0, 1, 2, 3],
-        dest: '/foo/bar'
+        dest: '/foo/bar',
       });
     });
 
-    it('uploads original image', function(done) {
-      image._upload = function(dest, version, cb) {
+    it('uploads original image', done => {
+      image._upload = (dest, version, cb) => {
         assert.deepEqual(version, {
           awsImageAcl: 'public',
           awsImageExpires: 31536000,
@@ -489,7 +486,7 @@ describe('Image', function() {
           original: true,
           width: 111,
           height: 222,
-          path: image.src
+          path: image.src,
         });
 
         cb(null, version);
@@ -498,10 +495,10 @@ describe('Image', function() {
       image.upload.opts.original = {
         awsImageAcl: 'public',
         awsImageExpires: 31536000,
-        awsImageMaxAge: 31536000
+        awsImageMaxAge: 31536000,
       };
 
-      image.uploadVersions(function(err, versions) {
+      image.uploadVersions((err, versions) => {
         assert.ifError(err);
 
         assert.deepEqual(versions, [{
@@ -511,7 +508,7 @@ describe('Image', function() {
           original: true,
           width: 111,
           height: 222,
-          path: image.src
+          path: image.src,
         }]);
 
         done();
@@ -520,41 +517,41 @@ describe('Image', function() {
         dest: '/foo/bar',
         metadata: {
           width: 111,
-          height: 222
-        }
+          height: 222,
+        },
       });
     });
   });
 
-  describe('#removeVersions()', function() {
-    var unlink = require('fs').unlink;
-    var results = {
-      uploads: []
+  describe('#removeVersions()', () => {
+    const unlink = fs.unlink;
+    const results = {
+      uploads: [],
     };
 
-    beforeEach(function() {
+    beforeEach(() => {
       image.upload.opts.cleanup = {};
       results.uploads = [{
         original: true,
-        path: '/foo/bar'
+        path: '/foo/bar',
       }, {
-        path: '/foo/bar-2'
+        path: '/foo/bar-2',
       }];
     });
 
-    afterEach(function() {
-      require('fs').unlink = unlink;
+    afterEach(() => {
+      fs.unlink = unlink;
     });
 
-    it('keeps all local images', function(done) {
-      require('fs').unlink = function() {
+    it('keeps all local images', done => {
+      fs.unlink = () => {
         assert.fail(new Error('unlink shall not be called'));
       };
       image.removeVersions(done, results);
     });
 
-    it('removes image versions by default', function(done) {
-      require('fs').unlink = function(path, cb) {
+    it('removes image versions by default', done => {
+      fs.unlink = (path, cb) => {
         assert.equal(path, results.uploads[1].path);
         cb();
       };
@@ -563,8 +560,8 @@ describe('Image', function() {
       image.removeVersions(done, results);
     });
 
-    it('removes original image', function(done) {
-      require('fs').unlink = function(path, cb) {
+    it('removes original image', done => {
+      fs.unlink = (path, cb) => {
         assert.equal(path, results.uploads[0].path);
         cb();
       };
@@ -573,10 +570,10 @@ describe('Image', function() {
       image.removeVersions(done, results);
     });
 
-    it('removes all images', function(done) {
-      var i = 0;
+    it('removes all images', done => {
+      let i = 0;
 
-      require('fs').unlink = function(path, cb) {
+      fs.unlink = (path, cb) => {
         assert.equal(path, results.uploads[i++].path);
         cb();
       };
@@ -588,27 +585,22 @@ describe('Image', function() {
   });
 });
 
-describe('Integration Tests', function() {
-  beforeEach(function() {
+describe('Integration Tests', () => {
+  beforeEach(() => {
     if (process.env.INTEGRATION_TEST !== 'true') {
-      upload._randomPath = function() {
-        return '110ec58a-a0f2-4ac4-8393-c866d813b8d1';
-      };
+      upload._randomPath = () => '110ec58a-a0f2-4ac4-8393-c866d813b8d1';
     }
   });
 
-  it('uploads image to new random path', function(done) {
+  it('uploads image to new random path', function it(done) {
     this.timeout(10000);
-    upload.upload(__dirname + '/assets/portrait.jpg', {}, function(e, images) {
+    upload.upload(`${__dirname}/assets/portrait.jpg`, {}, (e, images) => {
       assert.ifError(e);
 
-      var image;
-      for (var i = 0; images.length < 0; i++) {
-        image = images[i];
-
+      images.forEach(image => {
         if (image.key) {
           cleanup.push({
-            Key: image.key
+            Key: image.key,
           });
         }
 
@@ -625,31 +617,27 @@ describe('Integration Tests', function() {
           assert.equal(typeof image.height, 'number');
           assert.equal(typeof image.width, 'number');
         }
-      }
+      });
 
       done();
     });
   });
 
-  it('uploads image to fixed path', function(done) {
+  it('uploads image to fixed path', function it(done) {
     this.timeout(10000);
 
-    var file = __dirname + '/assets/portrait.jpg';
-    var opts = {
-      path: 'path/to/image'
+    const file = `${__dirname}/assets/portrait.jpg`;
+    const opts = {
+      path: 'path/to/image',
     };
 
-    upload.upload(file, opts, function(err, images) {
+    upload.upload(file, opts, (err, images) => {
       assert.ifError(err);
 
-      var image;
-
-      for (var i = 0; i < images.length; i++) {
-        image = images[i];
-
+      images.forEach(image => {
         if (image.key) {
           cleanup.push({
-            Key: image.key
+            Key: image.key,
           });
         }
 
@@ -666,7 +654,7 @@ describe('Integration Tests', function() {
           assert.equal(typeof image.height, 'number');
           assert.equal(typeof image.width, 'number');
         }
-      }
+      });
 
       done();
     });

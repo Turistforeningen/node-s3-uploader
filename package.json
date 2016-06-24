@@ -1,15 +1,22 @@
 {
   "name": "s3-uploader",
-  "version": "2.0.0-rc.1",
+  "version": null,
   "description": "Resize, rename, and upload images to AWS S3",
-  "main": "lib/index.js",
-  "directories": {
-    "test": "test"
-  },
+  "main": "index.js",
+  "files": [
+    "index.js",
+    "test"
+  ],
   "scripts": {
-    "hint": "jshint index.js test",
-    "test": "mocha test",
-    "watch": "mocha -bcw --check-leaks -R progress test"
+    "codacy-coverage": "codacy-coverage",
+    "cover": "istanbul cover --report lcovonly ./node_modules/.bin/_mocha -- -r test/support/env test/**",
+    "lint": "eslint index.js test",
+    "nsp": "nsp check",
+    "semantic-release": "semantic-release",
+    "start": "supervisor index.js",
+    "test": "mocha -b -c --check-leaks -R tap -r test/support/env test/**",
+    "test:watch": "mocha -w -b -c --check-leaks -R progress -r test/support/env test/**",
+    "greenkeeper-postpublish": "greenkeeper-postpublish"
   },
   "repository": {
     "type": "git",
@@ -25,9 +32,10 @@
     "upload",
     "versions"
   ],
+  "author": "Den Norske Turistforening (DNT) <opensource@turistforeningen.no>",
   "contributors": [
     "Håvard Ranum <havard.ranum@bouvet.no>",
-    "Hans Kristian Flaatten <hans.kristian.flaatten@turistforeningen.no>",
+    "Hans Kristian Flaatten <hans@starefossen.com>",
     "Anthony Ringoet <anthonyringoet@gmail.com>",
     "Luiz Freneda <lfreneda@gmail.com>",
     "Oleksii Sribnyi <me@codemanki.com>"
@@ -36,21 +44,27 @@
   "bugs": {
     "url": "https://github.com/Turistforeningen/node-s3-uploader/issues"
   },
-  "homepage": "https://github.com/Turistforeningen/node-s3-uploader",
-  "devDependencies": {
-    "@starefossen/rand-path": "^1",
-    "mocha": "~2",
-    "jshint": "^2.8.0"
-  },
+  "homepage": "https://github.com/Turistforeningen/node-s3-uploader#readme",
   "dependencies": {
-    "async": "~1.4",
-    "aws-sdk": "^2.2.9",
+    "async": "^1.5.2",
+    "aws-sdk": "^2.4.1",
     "im-metadata": "^3.0.0",
-    "im-resize": "~2.3.1",
-    "node-uuid": "^1.4.3"
+    "im-resize": "^2.3.1",
+    "node-uuid": "^1.4.7"
+  },
+  "devDependencies": {
+    "@starefossen/rand-path": "^2.0.0",
+    "codacy-coverage": "^1.1.3",
+    "eslint": "^2.11.0",
+    "eslint-config-airbnb-base": "^3.0.1",
+    "eslint-plugin-import": "^1.8.1",
+    "greenkeeper-postpublish": "^1.0.0",
+    "istanbul": "^0.4.3",
+    "mocha": "^2.5.3",
+    "nsp": "^2.4.0",
+    "semantic-release": "^4.3.5"
   },
   "engines": {
-    "node": ">=0.10",
-    "iojs": ">=1.0.0"
+    "node": ">=4.0.0"
   }
 }
