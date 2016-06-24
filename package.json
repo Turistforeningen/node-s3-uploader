@@ -4,8 +4,7 @@
   "description": "Resize, rename, and upload images to AWS S3",
   "main": "index.js",
   "files": [
-    "index.js",
-    "test"
+    "index.js"
   ],
   "scripts": {
     "codacy-coverage": "codacy-coverage",
