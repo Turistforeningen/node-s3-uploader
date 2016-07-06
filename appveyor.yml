@@ -1,0 +1,35 @@
+environment:
+  matrix:
+  - nodejs_version: "4"
+  - nodejs_version: "5"
+  - nodejs_version: "6"
+
+platform:
+  - x86
+  - x64
+
+# checkout all strings with \r\n
+init:
+  - git config --global core.autocrlf true
+
+# Install scripts. (runs after repo cloning)
+install:
+  # install ImageMagick
+  - ps: choco install imagemagick -y
+
+  # install Node.js
+  - ps: Install-Product node $env:nodejs_version
+
+  # install npm modules
+  - npm install
+
+# Post-install test scripts.
+test_script:
+  # Output useful info for debugging.
+  - node --version
+  - npm --version
+  # run tests
+  - npm test
+
+# Don't actually build.
+build: off
