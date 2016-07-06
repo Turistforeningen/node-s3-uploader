@@ -1,3 +1,5 @@
 'use strict';
 
-process.env.TMP_DIR = '/tmp';
+const tmpdir = require('os').tmpdir;
+
+process.env.TMP_DIR = tmpdir();
