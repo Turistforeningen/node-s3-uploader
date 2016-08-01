@@ -59,7 +59,7 @@
     "eslint-plugin-import": "^1.8.1",
     "greenkeeper-postpublish": "^1.0.0",
     "istanbul": "^0.4.3",
-    "mocha": "^2.5.3",
+    "mocha": "^3.0.0",
     "nsp": "^2.4.0",
     "semantic-release": "^4.3.5"
   },
