@@ -441,7 +441,9 @@ describe('Image', () => {
       image.getMetadata(image.src, (err1, metadata) => {
         assert.ifError(err1);
 
-        image.resizeVersions((err2, versions) => {
+        const results = { metadata };
+
+        image.resizeVersions(results, (err2, versions) => {
           assert.ifError(err2);
 
           versions.forEach(version => {
@@ -450,7 +452,7 @@ describe('Image', () => {
           });
 
           done();
-        }, { metadata });
+        });
       });
     });
   });
@@ -467,13 +469,15 @@ describe('Image', () => {
 
       image.upload.opts.original = undefined;
 
-      image.uploadVersions((err, versions) => {
+      const results = {
+        versions: [0, 1, 2, 3],
+        dest: '/foo/bar',
+      };
+
+      image.uploadVersions(results, (err, versions) => {
         assert.ifError(err);
         assert.deepEqual(versions, [1, 2, 3, 4]);
         done();
-      }, {
-        versions: [0, 1, 2, 3],
-        dest: '/foo/bar',
       });
     });
 
@@ -498,7 +502,16 @@ describe('Image', () => {
         awsImageMaxAge: 31536000,
       };
 
-      image.uploadVersions((err, versions) => {
+      const results = {
+        versions: [],
+        dest: '/foo/bar',
+        metadata: {
+          width: 111,
+          height: 222,
+        },
+      };
+
+      image.uploadVersions(results, (err, versions) => {
         assert.ifError(err);
 
         assert.deepEqual(versions, [{
@@ -512,13 +525,6 @@ describe('Image', () => {
         }]);
 
         done();
-      }, {
-        versions: [],
-        dest: '/foo/bar',
-        metadata: {
-          width: 111,
-          height: 222,
-        },
       });
     });
   });
@@ -547,7 +553,7 @@ describe('Image', () => {
       fs.unlink = () => {
         assert.fail(new Error('unlink shall not be called'));
       };
-      image.removeVersions(done, results);
+      image.removeVersions(results, done);
     });
 
     it('removes image versions by default', done => {
@@ -557,7 +563,7 @@ describe('Image', () => {
       };
 
       image.upload.opts.cleanup.versions = true;
-      image.removeVersions(done, results);
+      image.removeVersions(results, done);
     });
 
     it('removes original image', done => {
@@ -567,7 +573,7 @@ describe('Image', () => {
       };
 
       image.upload.opts.cleanup.original = true;
-      image.removeVersions(done, results);
+      image.removeVersions(results, done);
     });
 
     it('removes all images', done => {
@@ -580,7 +586,7 @@ describe('Image', () => {
 
       image.upload.opts.cleanup.original = true;
       image.upload.opts.cleanup.versions = true;
-      image.removeVersions(done, results);
+      image.removeVersions(results, done);
     });
   });
 });

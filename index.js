@@ -46,7 +46,7 @@ Image.prototype.getDest = function getDest(cb) {
   process.nextTick(() => cb(null, prefix + path));
 };
 
-Image.prototype.resizeVersions = function resizeVersions(cb, results) {
+Image.prototype.resizeVersions = function resizeVersions(results, cb) {
   resize(results.metadata, {
     path: this.upload.opts.resize.path,
     prefix: this.upload.opts.resize.prefix,
@@ -55,7 +55,7 @@ Image.prototype.resizeVersions = function resizeVersions(cb, results) {
   }, cb);
 };
 
-Image.prototype.uploadVersions = function uploadVersions(cb, results) {
+Image.prototype.uploadVersions = function uploadVersions(results, cb) {
   if (this.upload.opts.original) {
     const org = JSON.parse(JSON.stringify(this.upload.opts.original));
 
@@ -70,7 +70,7 @@ Image.prototype.uploadVersions = function uploadVersions(cb, results) {
   map(results.versions, this._upload.bind(this, results.dest), cb);
 };
 
-Image.prototype.removeVersions = function removeVersions(cb, results) {
+Image.prototype.removeVersions = function removeVersions(results, cb) {
   each(results.uploads, (image, callback) => {
     if (!this.upload.opts.cleanup.original && image.original ||
         !this.upload.opts.cleanup.versions && !image.original
