@@ -1,3 +1,4 @@
+/* eslint import/no-extraneous-dependencies: [error, { devDependencies: true }] */
 'use strict';
 
 const assert = require('assert');
