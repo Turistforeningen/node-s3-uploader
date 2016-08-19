@@ -72,8 +72,8 @@ Image.prototype.uploadVersions = function uploadVersions(results, cb) {
 
 Image.prototype.removeVersions = function removeVersions(results, cb) {
   each(results.uploads, (image, callback) => {
-    if (!this.upload.opts.cleanup.original && image.original ||
-        !this.upload.opts.cleanup.versions && !image.original
+    if ((!this.upload.opts.cleanup.original && image.original) ||
+        (!this.upload.opts.cleanup.versions && !image.original)
     ) {
       return setTimeout(callback, 0);
     }
