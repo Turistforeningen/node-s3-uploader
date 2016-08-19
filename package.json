@@ -45,7 +45,7 @@
   },
   "homepage": "https://github.com/Turistforeningen/node-s3-uploader#readme",
   "dependencies": {
-    "async": "^1.5.2",
+    "async": "^2.0.1",
     "aws-sdk": "^2.4.1",
     "im-metadata": "^3.0.0",
     "im-resize": "^2.3.1",
