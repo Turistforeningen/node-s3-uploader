@@ -8,13 +8,13 @@
   ],
   "scripts": {
     "codacy-coverage": "codacy-coverage",
-    "cover": "istanbul cover --report lcovonly ./node_modules/.bin/_mocha -- -r test/support/env test/**",
+    "cover": "istanbul cover --report lcovonly ./node_modules/.bin/_mocha -- -r test/support/env test",
     "lint": "eslint index.js test",
     "nsp": "nsp check",
     "semantic-release": "semantic-release",
     "start": "supervisor index.js",
-    "test": "mocha -b -c --check-leaks -R tap -r test/support/env test/**",
-    "test:watch": "mocha -w -b -c --check-leaks -R progress -r test/support/env test/**",
+    "test": "mocha -b -c --check-leaks -R tap -r test/support/env test",
+    "test:watch": "mocha -w -b -c --check-leaks -R progress -r test/support/env test",
     "greenkeeper-postpublish": "greenkeeper-postpublish"
   },
   "repository": {

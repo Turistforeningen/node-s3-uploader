@@ -9,6 +9,7 @@ const S3 = require('aws-sdk').S3;
 const ReadStream = require('fs').ReadStream;
 const statSync = require('fs').statSync;
 const unlinkSync = require('fs').unlinkSync;
+const pathSep = require('path').sep;
 
 const randomPath = require('@starefossen/rand-path');
 
@@ -184,14 +185,18 @@ describe('Image', () => {
   let image;
 
   beforeEach(() => {
-    image = new Upload.Image(`${__dirname}/assets/photo.jpg`, {}, upload);
+    const file = [__dirname, 'assets', 'photo.jpg'].join(pathSep);
+
+    image = new Upload.Image(file, {}, upload);
     image.upload._randomPath = () => '110ec58a-a0f2-4ac4-8393-c866d813b8d1';
   });
 
   describe('constructor', () => {
     it('sets default values', () => {
+      const file = [__dirname, 'assets', 'photo.jpg'].join(pathSep);
+
       assert(image instanceof Upload.Image);
-      assert.equal(image.src, `${__dirname}/assets/photo.jpg`);
+      assert.equal(image.src, file);
       assert.deepEqual(image.opts, {});
       assert(image.upload instanceof Upload);
     });
@@ -207,7 +212,7 @@ describe('Image', () => {
     });
 
     it('sets upload key', done => {
-      const version = { path: '/some/image.jpg' };
+      const version = { path: [__dirname, 'assets', 'photo.jpg'].join(pathSep) };
 
       image.upload.s3.putObject = (opts) => {
         assert.equal(opts.Key, '110ec58a-a0f2-4ac4-8393-c866d813b8d1.jpg');
@@ -219,7 +224,7 @@ describe('Image', () => {
 
     it('sets upload key suffix', done => {
       const version = {
-        path: '/some/image.jpg',
+        path: [__dirname, 'assets', 'photo.jpg'].join(pathSep),
         suffix: '-small',
       };
 
@@ -234,7 +239,7 @@ describe('Image', () => {
 
     it('sets upload key format', done => {
       const version = {
-        path: '/some/image.png',
+        path: [__dirname, 'assets', 'photo.png'].join(pathSep),
       };
 
       image.upload.s3.putObject = (opts) => {
@@ -247,7 +252,7 @@ describe('Image', () => {
 
     it('sets default ACL', done => {
       const version = {
-        path: '/some/image.png',
+        path: [__dirname, 'assets', 'photo.png'].join(pathSep),
       };
 
       image.upload.s3.putObject = (opts) => {
@@ -260,7 +265,7 @@ describe('Image', () => {
 
     it('sets specific ACL', done => {
       const version = {
-        path: '/some/image.png',
+        path: [__dirname, 'assets', 'photo.png'].join(pathSep),
         awsImageAcl: 'private',
       };
 
@@ -274,7 +279,7 @@ describe('Image', () => {
 
     it('sets upload body', done => {
       const version = {
-        path: '/some/image.png',
+        path: [__dirname, 'assets', 'photo.png'].join(pathSep),
       };
 
       image.upload.s3.putObject = (opts) => {
@@ -288,7 +293,7 @@ describe('Image', () => {
 
     it('sets upload content type for png', done => {
       const version = {
-        path: '/some/image.png',
+        path: [__dirname, 'assets', 'photo.png'].join(pathSep),
       };
 
       image.upload.s3.putObject = (opts) => {
@@ -301,7 +306,7 @@ describe('Image', () => {
 
     it('sets upload content type for jpg', done => {
       const version = {
-        path: '/some/image.jpg',
+        path: [__dirname, 'assets', 'photo.jpg'].join(pathSep),
       };
 
       image.upload.s3.putObject = (opts) => {
@@ -314,7 +319,7 @@ describe('Image', () => {
 
     it('sets upload expire header for version', done => {
       const version = {
-        path: '/some/image.jpg',
+        path: [__dirname, 'assets', 'photo.jpg'].join(pathSep),
         awsImageExpires: 1234,
       };
 
@@ -328,7 +333,7 @@ describe('Image', () => {
 
     it('sets upload cache-control header for version', done => {
       const version = {
-        path: '/some/image.jpg',
+        path: [__dirname, 'assets', 'photo.jpg'].join(pathSep),
         awsImageMaxAge: 1234,
       };
 
@@ -342,7 +347,7 @@ describe('Image', () => {
 
     it('returns etag for uploaded version', done => {
       const version1 = {
-        path: '/some/image.jpg',
+        path: [__dirname, 'assets', 'photo.jpg'].join(pathSep),
       };
 
       const dest = '110ec58a-a0f2-4ac4-8393-c866d813b8d1';
@@ -355,7 +360,7 @@ describe('Image', () => {
 
     it('returns url for uploaded version', done => {
       const version1 = {
-        path: '/some/image.jpg',
+        path: [__dirname, 'assets', 'photo.jpg'].join(pathSep),
       };
 
       const dest = '110ec58a-a0f2-4ac4-8393-c866d813b8d1';
@@ -601,7 +606,10 @@ describe('Integration Tests', () => {
 
   it('uploads image to new random path', function it(done) {
     this.timeout(10000);
-    upload.upload(`${__dirname}/assets/portrait.jpg`, {}, (e, images) => {
+
+    const file = [__dirname, 'assets', 'portrait.jpg'].join(pathSep);
+
+    upload.upload(file, {}, (e, images) => {
       assert.ifError(e);
 
       images.forEach(image => {
@@ -633,7 +641,7 @@ describe('Integration Tests', () => {
   it('uploads image to fixed path', function it(done) {
     this.timeout(10000);
 
-    const file = `${__dirname}/assets/portrait.jpg`;
+    const file = [__dirname, 'assets', 'portrait.jpg'].join(pathSep);
     const opts = {
       path: 'path/to/image',
     };
