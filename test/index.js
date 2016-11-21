@@ -132,13 +132,15 @@ describe('Upload', () => {
         url: 'https://s3.amazonaws.com/myBucket/',
       });
     });
-    it('sets default url based on AWS region', () => {
-      upload = new Upload('b', {
-        aws: {
-          region: 'my-region-1',
-        },
-      });
+
+    it('sets correct url for custom AWS region', () => {
+      upload = new Upload('b', { aws: { region: 'my-region-1' } });
       assert.equal(upload.opts.url, 'https://s3-my-region-1.amazonaws.com/b/');
+    });
+
+    it('sets correct url for cn-north-1 AWS region', () => {
+      upload = new Upload('b', { aws: { region: 'cn-north-1' } });
+      assert.equal(upload.opts.url, 'https://s3.cn-north-1.amazonaws.com/b/');
     });
 
     it('sets custom url', () => {
