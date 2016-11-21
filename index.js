@@ -150,7 +150,12 @@ const Upload = function Upload(bucketName, opts) {
 
   if (!this.opts.url && this.opts.aws.region === 'us-east-1') {
     this.opts.url = `https://s3.amazonaws.com/${bucketName}/`;
-  } else if (!this.opts.url) {
+  }else if (!this.opts.url && this.opts.aws.region === 'cn-north-1') {
+    this.opts.url = [
+      'https://s3.', this.opts.aws.region,
+      '.amazonaws.com.cn/', bucketName, '/',
+    ].join('');
+  else if (!this.opts.url) {
     this.opts.url = [
       'https://s3-', this.opts.aws.region,
       '.amazonaws.com/', bucketName, '/',
