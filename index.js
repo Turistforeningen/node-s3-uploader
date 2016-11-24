@@ -7,7 +7,7 @@ const S3 = require('aws-sdk').S3;
 const auto = require('async').auto;
 const each = require('async').each;
 const map = require('async').map;
-const uuid = require('node-uuid');
+const uuid = require('uuid');
 
 const resize = require('im-resize');
 const metadata = require('im-metadata');
