@@ -1,4 +1,5 @@
-/* eslint import/no-extraneous-dependencies: [error, { devDependencies: true }] */
+/* eslint import/no-extraneous-dependencies: [error, { devDependencies: true }], no-plusplus: 0 */
+
 'use strict';
 
 const assert = require('assert');
@@ -206,7 +207,7 @@ describe('Image', () => {
       };
     });
 
-    it('sets upload key', done => {
+    it('sets upload key', (done) => {
       const version = { path: '/some/image.jpg' };
 
       image.upload.s3.putObject = (opts) => {
@@ -217,7 +218,7 @@ describe('Image', () => {
       image._upload('110ec58a-a0f2-4ac4-8393-c866d813b8d1', version);
     });
 
-    it('sets upload key suffix', done => {
+    it('sets upload key suffix', (done) => {
       const version = {
         path: '/some/image.jpg',
         suffix: '-small',
@@ -232,7 +233,7 @@ describe('Image', () => {
       image._upload('110ec58a-a0f2-4ac4-8393-c866d813b8d1', version);
     });
 
-    it('sets upload key format', done => {
+    it('sets upload key format', (done) => {
       const version = {
         path: '/some/image.png',
       };
@@ -245,7 +246,7 @@ describe('Image', () => {
       image._upload('110ec58a-a0f2-4ac4-8393-c866d813b8d1', version);
     });
 
-    it('sets default ACL', done => {
+    it('sets default ACL', (done) => {
       const version = {
         path: '/some/image.png',
       };
@@ -258,7 +259,7 @@ describe('Image', () => {
       image._upload('110ec58a-a0f2-4ac4-8393-c866d813b8d1', version);
     });
 
-    it('sets specific ACL', done => {
+    it('sets specific ACL', (done) => {
       const version = {
         path: '/some/image.png',
         awsImageAcl: 'private',
@@ -272,7 +273,7 @@ describe('Image', () => {
       image._upload('110ec58a-a0f2-4ac4-8393-c866d813b8d1', version);
     });
 
-    it('sets upload body', done => {
+    it('sets upload body', (done) => {
       const version = {
         path: '/some/image.png',
       };
@@ -286,7 +287,7 @@ describe('Image', () => {
       image._upload('110ec58a-a0f2-4ac4-8393-c866d813b8d1', version);
     });
 
-    it('sets upload content type for png', done => {
+    it('sets upload content type for png', (done) => {
       const version = {
         path: '/some/image.png',
       };
@@ -299,7 +300,7 @@ describe('Image', () => {
       image._upload('110ec58a-a0f2-4ac4-8393-c866d813b8d1', version);
     });
 
-    it('sets upload content type for jpg', done => {
+    it('sets upload content type for jpg', (done) => {
       const version = {
         path: '/some/image.jpg',
       };
@@ -312,7 +313,7 @@ describe('Image', () => {
       image._upload('110ec58a-a0f2-4ac4-8393-c866d813b8d1', version);
     });
 
-    it('sets upload expire header for version', done => {
+    it('sets upload expire header for version', (done) => {
       const version = {
         path: '/some/image.jpg',
         awsImageExpires: 1234,
@@ -326,7 +327,7 @@ describe('Image', () => {
       image._upload('110ec58a-a0f2-4ac4-8393-c866d813b8d1', version);
     });
 
-    it('sets upload cache-control header for version', done => {
+    it('sets upload cache-control header for version', (done) => {
       const version = {
         path: '/some/image.jpg',
         awsImageMaxAge: 1234,
@@ -340,7 +341,7 @@ describe('Image', () => {
       image._upload('110ec58a-a0f2-4ac4-8393-c866d813b8d1', version);
     });
 
-    it('returns etag for uploaded version', done => {
+    it('returns etag for uploaded version', (done) => {
       const version1 = {
         path: '/some/image.jpg',
       };
@@ -353,7 +354,7 @@ describe('Image', () => {
       });
     });
 
-    it('returns url for uploaded version', done => {
+    it('returns url for uploaded version', (done) => {
       const version1 = {
         path: '/some/image.jpg',
       };
@@ -368,7 +369,7 @@ describe('Image', () => {
   });
 
   describe('#getMetadata()', () => {
-    it('returns image metadata without exif data', done => {
+    it('returns image metadata without exif data', (done) => {
       image.upload.opts.returnExif = false;
       image.getMetadata(image.src, (err, metadata) => {
         assert.ifError(err);
@@ -386,7 +387,7 @@ describe('Image', () => {
       });
     });
 
-    it('returns image metadata with exif data', done => {
+    it('returns image metadata with exif data', (done) => {
       image.upload.opts.returnExif = true;
       image.getMetadata(image.src, (err, metadata) => {
         assert.ifError(err);
@@ -398,7 +399,7 @@ describe('Image', () => {
   });
 
   describe('#getDest()', () => {
-    it('returns destination path', done => {
+    it('returns destination path', (done) => {
       const dest = '110ec58a-a0f2-4ac4-8393-c866d813b8d1';
 
       image.getDest((err, path) => {
@@ -408,7 +409,7 @@ describe('Image', () => {
       });
     });
 
-    it('overrides destination path prefix', done => {
+    it('overrides destination path prefix', (done) => {
       image.opts.awsPath = 'custom/path/';
       image.getDest((err, path) => {
         assert.ifError(err);
@@ -417,7 +418,7 @@ describe('Image', () => {
       });
     });
 
-    it('returns fixed upload path', done => {
+    it('returns fixed upload path', (done) => {
       image.opts.path = 'my/image';
       image.getDest((err, path) => {
         assert.ifError(err);
@@ -426,7 +427,7 @@ describe('Image', () => {
       });
     });
 
-    it('returns fixed upload path with custom prefix', done => {
+    it('returns fixed upload path with custom prefix', (done) => {
       image.opts.awsPath = 'custom/path/';
       image.opts.path = 'my/image';
       image.getDest((err, path) => {
@@ -438,7 +439,7 @@ describe('Image', () => {
   });
 
   describe('#resizeVersions()', () => {
-    it('resizes image versions', done => {
+    it('resizes image versions', (done) => {
       image.getMetadata(image.src, (err1, metadata) => {
         assert.ifError(err1);
 
@@ -447,7 +448,7 @@ describe('Image', () => {
         image.resizeVersions(results, (err2, versions) => {
           assert.ifError(err2);
 
-          versions.forEach(version => {
+          versions.forEach((version) => {
             statSync(version.path);
             unlinkSync(version.path);
           });
@@ -459,7 +460,7 @@ describe('Image', () => {
   });
 
   describe('#uploadVersions()', () => {
-    it('uploads image versions', done => {
+    it('uploads image versions', (done) => {
       let i = 0;
 
       image._upload = (dest, version, cb) => {
@@ -482,7 +483,7 @@ describe('Image', () => {
       });
     });
 
-    it('uploads original image', done => {
+    it('uploads original image', (done) => {
       image._upload = (dest, version, cb) => {
         assert.deepEqual(version, {
           awsImageAcl: 'public',
@@ -550,14 +551,14 @@ describe('Image', () => {
       fs.unlink = unlink;
     });
 
-    it('keeps all local images', done => {
+    it('keeps all local images', (done) => {
       fs.unlink = () => {
         assert.fail(new Error('unlink shall not be called'));
       };
       image.removeVersions(results, done);
     });
 
-    it('removes image versions by default', done => {
+    it('removes image versions by default', (done) => {
       fs.unlink = (path, cb) => {
         assert.equal(path, results.uploads[1].path);
         cb();
@@ -567,7 +568,7 @@ describe('Image', () => {
       image.removeVersions(results, done);
     });
 
-    it('removes original image', done => {
+    it('removes original image', (done) => {
       fs.unlink = (path, cb) => {
         assert.equal(path, results.uploads[0].path);
         cb();
@@ -577,7 +578,7 @@ describe('Image', () => {
       image.removeVersions(results, done);
     });
 
-    it('removes all images', done => {
+    it('removes all images', (done) => {
       let i = 0;
 
       fs.unlink = (path, cb) => {
@@ -604,7 +605,7 @@ describe('Integration Tests', () => {
     upload.upload(`${__dirname}/assets/portrait.jpg`, {}, (e, images) => {
       assert.ifError(e);
 
-      images.forEach(image => {
+      images.forEach((image) => {
         if (image.key) {
           cleanup.push({
             Key: image.key,
@@ -641,7 +642,7 @@ describe('Integration Tests', () => {
     upload.upload(file, opts, (err, images) => {
       assert.ifError(err);
 
-      images.forEach(image => {
+      images.forEach((image) => {
         if (image.key) {
           cleanup.push({
             Key: image.key,
