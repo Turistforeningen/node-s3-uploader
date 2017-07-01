@@ -97,7 +97,7 @@ Image.prototype._upload = function _upload(dest, version, cb) {
   };
 
   if (version.awsImageExpires) {
-    options.Expires = new Date(Date.now() + version.awsImageExpires);
+    options.Expires = new Date(Date.now() + version.awsImageExpires * 1000);
   }
 
   if (version.awsImageMaxAge) {
