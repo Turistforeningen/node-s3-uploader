@@ -12,6 +12,19 @@ const uuid = require('uuid');
 const resize = require('im-resize');
 const metadata = require('im-metadata');
 
+const httpProxy = process.env.HTTP_PROXY || process.env.HTTPS_PROXY;
+
+if (process.env.HTTP_PROXY || process.env.HTTPS_PROXY) {
+  const AWS = require('aws-sdk');
+  const proxy = require('proxy-agent');
+  
+  AWS.config.update({
+    httpOptions: {
+      agent: proxy(httpProxy)
+    }
+  });
+}
+
 const Image = function Image(src, opts, upload) {
   this.src = src;
   this.opts = opts;
@@ -73,7 +86,7 @@ Image.prototype.uploadVersions = function uploadVersions(results, cb) {
 Image.prototype.removeVersions = function removeVersions(results, cb) {
   each(results.uploads, (image, callback) => {
     if ((!this.upload.opts.cleanup.original && image.original) ||
-        (!this.upload.opts.cleanup.versions && !image.original)
+      (!this.upload.opts.cleanup.versions && !image.original)
     ) {
       return setTimeout(callback, 0);
     }
