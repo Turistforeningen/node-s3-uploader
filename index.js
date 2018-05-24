@@ -14,13 +14,13 @@ const metadata = require('im-metadata');
 
 const httpProxy = process.env.HTTP_PROXY || process.env.HTTPS_PROXY;
 
-if (process.env.HTTP_PROXY || process.env.HTTPS_PROXY) {
+if (httpProxy) {
   const AWS = require('aws-sdk');
-  const proxy = require('proxy-agent');
+  const proxyAgent = require('proxy-agent');
   
   AWS.config.update({
     httpOptions: {
-      agent: proxy(httpProxy)
+      agent: proxyAgent(httpProxy)
     }
   });
 }
